@@ -4,8 +4,10 @@ include ../Toolkit/fast-ninja/xlr8.fninja
 include ../Toolkit/fast-ninja/scripts.fninja
 
 sources :=
+    backbit.s
     charset.s
     clock.s
+    clock-backbit.s
     clock-iec.s
     display-clock.s
     screen.s

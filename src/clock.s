@@ -1,6 +1,63 @@
-MAX_CLOCKS = 6
+MAX_CLOCK_DISPLAYS = 6
+MAX_CLOCKS = 16
+
+CLOCK_WEEKDAY = $80
+CLOCK_SUB_SECOND = $1
 
 .section code
+
+clocks_init {
+    lda #0
+    sta clocks_count
+    jsr clock_backbit_detect
+    ; TODO: detect others
+    rts
+}
+
+; X/Y: pointer to clock info
+; A: parameter
+clock_register {
+    stx ptr
+    sty ptr + 1
+    ldx clocks_count
+    inx
+    stx clocks_count
+    ldy #0
+    lda (ptr),y
+    iny
+    sta clocks_parameter,x
+    lda (ptr),y
+    iny
+    sta clocks_flags,x
+    txa
+    asl
+    tax
+    lda (ptr),y
+    iny
+    sta clocks_name,x
+    lda (ptr),y
+    iny
+    sta clocks_name + 1,x
+    lda (ptr),y
+    iny
+    sta clocks_open,x
+    lda (ptr),y
+    iny
+    sta clocks_open + 1,x
+    lda (ptr),y
+    iny
+    sta clocks_read,x
+    lda (ptr),y
+    iny
+    sta clocks_read + 1,x
+    lda (ptr),y
+    iny
+    sta clocks_close,x
+    lda (ptr),y
+    iny
+    sta clocks_close + 1,x
+    rts
+}
 
 ; X: clock index
 ; preserves X
@@ -31,40 +88,26 @@ end:
     rts
 }
 
-.section data
-
-weekday {
-    .data 3, 3, 3, 3, 3, 3
-}
-century {
-    .data $20, $20, $20, $20, $20, $20
-}
-
-year {
-    .data $24, $24, $24, $24, $24, $24
-}
-
-month {
-    .data $05, $05, $05, $05, $05, $05
-}
-
-day {
-    .data $15, $15, $15, $15, $15, $15
-}
-
-hour {
-    .data $13, $12, $13, $13, $13, $13
-}
-
-minute {
-    .data $05, $45, $05, $05, $05, $05
-}
-
-second {
-    .data $01, $02, $03, $04, $05, $06
-}
-
 .section reserved
 
-am_pm .reserve MAX_CLOCKS
-status .reserve MAX_CLOCKS
+clocks_count .reserve 1
+clocks_read .reserve MAX_CLOCKS * 2
+clocks_open .reserve MAX_CLOCKS * 2
+clocks_close .reserve MAX_CLOCKS * 2
+clocks_name .reserve MAX_CLOCKS * 2
+clocks_parameter .reserve MAX_CLOCKS
+clocks_flags .reserve MAX_CLOCKS
+
+
+
+weekday .reserve MAX_CLOCK_DISPLAYS
+century .reserve MAX_CLOCK_DISPLAYS
+year .reserve MAX_CLOCK_DISPLAYS
+month .reserve MAX_CLOCK_DISPLAYS
+day .reserve MAX_CLOCK_DISPLAYS
+hour .reserve MAX_CLOCK_DISPLAYS
+minute .reserve MAX_CLOCK_DISPLAYS
+second .reserve MAX_CLOCK_DISPLAYS
+sub_second .reserve MAX_CLOCK_DISPLAYS
+am_pm .reserve MAX_CLOCK_DISPLAYS
+status .reserve MAX_CLOCK_DISPLAYS
