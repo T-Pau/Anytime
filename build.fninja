@@ -1,0 +1,24 @@
+VERSION = 0.1
+
+distfile := Anytime-$VERSION.zip
+
+built_dist_files :=
+  src/anytime.prg
+
+dist_files :=
+  README.md
+  NEWS.md
+  $built_dist_files
+#  screenshot.png
+
+
+rule zip
+  command = zip -9jq $out $in
+
+build $distfile: zip $dist_files
+
+build dist: phony $distfile
+
+default $built_dist_files
+
+subninja src/build.fninja

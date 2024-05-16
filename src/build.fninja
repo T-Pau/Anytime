@@ -1,0 +1,24 @@
+petcat = petcat
+
+include ../Toolkit/fast-ninja/xlr8.fninja
+include ../Toolkit/fast-ninja/scripts.fninja
+
+sources :=
+    charset.s
+    clock.s
+    clock-iec.s
+    display-clock.s
+    screen.s
+    start.s
+
+build anytime.prg | anytime.prg.sym: link $sources
+    target = c64-basic
+    libs = cbm.lib c64.lib
+
+build anytime.prg.ll: vice-ll anytime.prg.sym
+
+build charset.s: convert-charset charset.png
+    flags = -i
+    name = charset
+
+build help-screens.s: convert-screens help-screens.txt
