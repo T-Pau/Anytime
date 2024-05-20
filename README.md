@@ -6,8 +6,8 @@ It is currently in the early stages of development and not yet functional.
 ## Supported Devices
 
 - BackBit Cartridge
-- CMD FD
+- CMD FD with Real Time Clock module
 - CMD HD
 - CMD RAMLink
 - IDE64
-- SD2IEC
+- SD2IEC with Real Time Clock
