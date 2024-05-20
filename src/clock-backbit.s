@@ -24,8 +24,8 @@
 ; Returns: -
 .public clock_backbit_read {
     sei
-    sta BACKBIT_GET_RTC
     sta BACKBIT_COMMAND_SUFFIX
+    sta BACKBIT_GET_RTC
 
     lda #$ff
     sta weekday,x
@@ -43,7 +43,11 @@
     jsr read_ascii
     sta day,x
     lda BACKBIT_RTC_HOUR
+    and #$1f
     sta hour,x
+    lda BACKBIT_RTC_HOUR
+    and #$80
+    sta am_pm,x
     lda BACKBIT_RTC_MINUTE
     sta minute,x
     lda BACKBIT_RTC_SECOND
@@ -97,7 +101,7 @@ read_ascii {
 
 clock_backbit_info {
     .data $ff ; parameter
-    .data CLOCK_FLAG_CENTURY | CLOCK_FLAG_SUB_SECOND ; flags
+    .data CLOCK_FLAG_CENTURY ; flags
     .data clock_backbit_name
     .data $0000 ; open
     .data clock_backbit_read ; read

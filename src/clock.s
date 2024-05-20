@@ -3,6 +3,7 @@ MAX_CLOCKS = 16
 
 CLOCK_FLAG_WEEKDAY = $80
 CLOCK_FLAG_CENTURY = $40
+CLOCK_FLAG_24_HOURS = $20
 CLOCK_FLAG_SUB_SECOND = $1
 
 CLOCK_STATUS_ERROR = $80
@@ -128,6 +129,9 @@ clock_normalize {
 :   tya
     sta century,x
 century_ok:
+    lda clocks_flags,x
+    and #CLOCK_FLAG_24_HOURS
+    bne end
     lda am_pm,x
     beq end
     lda hour,x

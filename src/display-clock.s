@@ -89,8 +89,8 @@ time:
     lda #PARAMETER_COLOR
     sta (ptr),y
     iny
-    ldx #0
     lda clocks_parameter,x
+    ldx #0
 :   cmp #100
     bcc hundreds_done
     sec

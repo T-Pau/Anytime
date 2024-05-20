@@ -103,13 +103,47 @@ check_iec_device {
     bcs end
     lda iec_response_length
     cmp #8
-    bne end
-    ; TODO: set name from UI response
-    ldx #<clock_iec_info
-    ldy #>clock_iec_info
-    jsr clock_register
+    beq :+
 end:
     rts
+:   ldx #<iec_command_ui
+    ldy #>iec_command_ui
+    lda clock_iec_info
+    jsr iec_command_send
+    bcs no_name
+
+    ldx #0
+cmp_name:
+    lda identities,x
+    sta ptr
+    lda identities + 1,x
+    sta ptr + 1
+    ldy #0
+cmp_char:
+    lda (ptr),y
+    bne :+
+    lda names,x
+    ldy names + 1,x
+    tax
+    jmp register
+:   cmp iec_response + 3,y
+    bne :+
+    iny
+    bne cmp_char
+:   inx
+    inx
+    cpx names_count * 2
+    bne cmp_name
+
+no_name:
+    ldx #<name_unknown
+    ldy #>name_unknown
+register:
+    stx clock_iec_info + 2
+    sty clock_iec_info + 3
+    ldx #<clock_iec_info
+    ldy #>clock_iec_info
+    jmp clock_register
 }
 
 
@@ -126,16 +160,44 @@ iec_command_read {
     .data "t-rb", $d, 0
 }
 
-name_iec {
-    .data "IEC":screen, 0
+identities {
+    .data identity_cmd_fd
+    .data identity_cmd_hd
+    .data identity_ide64
+    .data identity_sd2iec
 }
 
-name_cmd_fd_2000 {
-    .data "FD-2000":screen, 0
+identity_cmd_fd {
+    .data "cmd fd",0
 }
 
-name_cmd_fd_4000 {
-    .data "FD-4000":screen, 0
+identity_cmd_hd {
+    .data "cmd hd",0
+}
+
+identity_ide64 {
+    .data "ide64",0
+}
+
+identity_sd2iec {
+    .data "sd2iec",0
+}
+
+names {
+    .data name_cmd_fd
+    .data name_cmd_hd
+    .data name_ide64
+    .data name_sd2iec
+}
+
+names_count = .sizeof(names) / 2
+
+name_unknown {
+    .data "Drive":screen, 0
+}
+
+name_cmd_fd {
+    .data "CMD FD":screen, 0
 }
 
 name_cmd_hd {
@@ -153,7 +215,7 @@ name_sd2iec {
 clock_iec_info {
     .data $08 ; parameter
     .data CLOCK_FLAG_WEEKDAY ; flags
-    .data name_iec ; name
+    .data name_unknown ; name
     .data clock_iec_open ; open
     .data clock_iec_read ; read
     .data clock_iec_close ; close
