@@ -164,7 +164,15 @@ identities {
     .data identity_cmd_fd
     .data identity_cmd_hd
     .data identity_ide64
+    .data identity_ramlink
     .data identity_sd2iec
+}
+names {
+    .data name_cmd_fd
+    .data name_cmd_hd
+    .data name_ide64
+    .data name_ramlink
+    .data name_sd2iec
 }
 
 identity_cmd_fd {
@@ -187,13 +195,6 @@ identity_sd2iec {
     .data "sd2iec",0
 }
 
-names {
-    .data name_cmd_fd
-    .data name_cmd_hd
-    .data name_ide64
-    .data name_ramlink
-    .data name_sd2iec
-}
 
 names_count = .sizeof(names) / 2
 
