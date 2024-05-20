@@ -179,6 +179,10 @@ identity_ide64 {
     .data " ide dos",0
 }
 
+identity_ramlink {
+    .data "cmd rl",0
+}
+
 identity_sd2iec {
     .data "sd2iec",0
 }
@@ -187,6 +191,7 @@ names {
     .data name_cmd_fd
     .data name_cmd_hd
     .data name_ide64
+    .data name_ramlink
     .data name_sd2iec
 }
 
@@ -206,6 +211,10 @@ name_cmd_hd {
 
 name_ide64 {
     .data "IDE64":screen, 0
+}
+
+name_ramlink {
+    .data "RAMLink":screen, 0
 }
 
 name_sd2iec {
