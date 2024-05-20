@@ -176,7 +176,7 @@ identity_cmd_hd {
 }
 
 identity_ide64 {
-    .data "ide64",0
+    .data " ide dos",0
 }
 
 identity_sd2iec {
