@@ -1,89 +1,117 @@
+IEC_FIRST_DEVICE = 8
+IEC_LAST_DEVICE = 16
+
 .section code
 
-; X: clock index
-; A: device ID
-.public iec_open {
+; -------------------------------------------------------
+; Clock driver API
+; -------------------------------------------------------
+
+; Detect and register IEC devices with RTC.
+; Arguments: -
+; Returns: -
+.public clock_iec_detect {
+    ldx #IEC_FIRST_DEVICE
+loop:
+    stx clock_iec_info
     txa
-    ora #8
-    tax
-    ldy #15
-    jsr SETLFS
-    ldx #<empty_name
-    ldy #>empty_name
-    lda #0
-    jsr SETNAM
-    jmp OPEN
+    jsr iec_command_open
+    cmp #0
+    bne :+
+    lda clock_iec_info
+    jsr check_iec_device
+    lda clock_iec_info
+    jsr iec_command_close
+:   ldx clock_iec_info
+    inx
+    cpx #IEC_LAST_DEVICE + 1
+    bcc loop
+    rts
 }
 
-; X: clock index
-.public iec_close {
-    txa
-    ora #8
-    jmp CLOSE
+; Open clock.
+; Arguments:
+;   A: clock parameter (device id)
+;   X: clock index
+; Returns: -
+.public clock_iec_open {
+    tax
+    jmp iec_command_open
 }
 
-; X: clock index
-; preserves X
-.public iec_read {
-    stx iec_tmp
-    txa
-    ora #8
-    tax
-    jsr CHKOUT
+
+; Close clock.
+; Arguments:
+;   A: clock parameter (device id)
+;   X: clock index
+; Returns: -
+.public clock_iec_close = iec_command_close
+
+
+; Read clock.
+; Arguments:
+;   A: clock parameter (device id)
+;   X: clock index
+; Returns: -
+.public clock_iec_read {
+    ldx #<iec_command_read
+    ldy #>iec_command_read
+    jsr iec_command_send
+    ldx clocks_current
     bcc :+
 error:
-    lda #1
+    lda #CLOCK_STATUS_ERROR
     sta status,x
     rts
-:   ldx #<iec_command_read
-    ldy #>iec_command_read
-    jsr print_message
-    jsr CLRCHN
+:   lda iec_response_length
+    cmp #8
+    bne error
 
-    lda iec_tmp
-    ora #8
-    tax
-    jsr CHKIN
-    bcs error
-    ldx iec_tmp
-    jsr CHRIN
+    lda iec_response
     sta weekday,x
-    lda #$ff
-    sta century
-    jsr CHRIN
+    lda iec_response + 1
     sta year,x
-    jsr CHRIN
+    lda iec_response + 2
     sta month,x
-    jsr CHRIN
+    lda iec_response + 3
     sta day,x
-    jsr CHRIN
+    lda iec_response + 4
     sta hour,x
-    jsr CHRIN
+    lda iec_response + 5
     sta minute,x
-    jsr CHRIN
+    lda iec_response + 6
     sta second,x
-    jsr CHRIN
+    lda iec_response + 7
     sta am_pm,x
-    jsr CHRIN
-    eor #$0d
-    sta status,x
-    jsr CLRCHN
-    ldx iec_tmp
     rts
 }
 
-print_message {
-    stx ptr
-    sty ptr + 1
-    ldy #0
-:   lda (ptr),y
-    beq end
-    jsr CHROUT
-    iny
-    bne :-
+; -------------------------------------------------------
+; helper routines
+; -------------------------------------------------------
+
+
+; Check if IEC device has an RTC and register as clock if it does.
+; Arguments:
+;   A: device id
+; Returns: -
+; Preserves: -
+check_iec_device {
+    ldx #<iec_command_read
+    ldy #>iec_command_read
+    jsr iec_command_send
+    bcs end
+    lda iec_response_length
+    cmp #8
+    bne end
+    ; TODO: set name from UI response
+    ldx #<clock_iec_info
+    ldy #>clock_iec_info
+    jsr clock_register
 end:
     rts
 }
+
 
 .section data
 
@@ -91,8 +119,44 @@ empty_name {
     .data 0
 }
 
+iec_command_ui {
+    .data "ui", $d, 0
+}
 iec_command_read {
     .data "t-rb", $d, 0
+}
+
+name_iec {
+    .data "IEC":screen, 0
+}
+
+name_cmd_fd_2000 {
+    .data "FD-2000":screen, 0
+}
+
+name_cmd_fd_4000 {
+    .data "FD-4000":screen, 0
+}
+
+name_cmd_hd {
+    .data "CMD HD":screen, 0
+}
+
+name_ide64 {
+    .data "IDE64":screen, 0
+}
+
+name_sd2iec {
+    .data "SD2IEC":screen, 0
+}
+
+clock_iec_info {
+    .data $08 ; parameter
+    .data CLOCK_FLAG_WEEKDAY ; flags
+    .data name_iec ; name
+    .data clock_iec_open ; open
+    .data clock_iec_read ; read
+    .data clock_iec_close ; close
 }
 
 .section reserved
@@ -102,3 +166,4 @@ iec_tmp .reserve 1
 .section zero_page
 
 ptr .reserve 2
+ptr2 .reserve 2

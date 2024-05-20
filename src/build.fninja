@@ -10,6 +10,7 @@ sources :=
     clock-backbit.s
     clock-iec.s
     display-clock.s
+    iec.s
     screen.s
     start.s
 

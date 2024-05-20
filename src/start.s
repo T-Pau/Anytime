@@ -1,13 +1,31 @@
+screen = $0400
+color_ram = $d800
+
 .section code
 
 .public start {
-    ldx #VIC_VIDEO_ADDRESS($400, $2000)
-    stx VIC_VIDEO_ADDRESS
+    jsr setup_display
 
-    lda #$0c
+    jsr clocks_init
+    jsr clocks_init_display
+
+loop:
+    jsr clocks_update
+    jmp loop
+}
+
+setup_display {
+    lda #VIC_VIDEO_ADDRESS($400, $2000)
+    sta VIC_VIDEO_ADDRESS
+
+    lda #FRAME_COLOR
     sta VIC_BORDER_COLOR
-    lda #$0f
+    sta VIC_BACKGROUND_COLOR_2
+    lda #BACKGROUND_COLOR
     sta VIC_BACKGROUND_COLOR
+    lda VIC_CONTROL_1
+    ora #VIC_EXTENDED_BACKGROUND_COLOR
+    sta VIC_CONTROL_1
 
     ldx #0
 :   lda main_screen,x
@@ -28,28 +46,10 @@
     sta $dae8,x
     dex
     bne :-
-
-    lda #$04
-    sta screen_ptr + 1
-
-    ldx #0
-    lda #8
-    jsr iec_open
-
-loop:
-    ldx #0
-    jsr iec_read
-    jsr clock_normalize
-    ldy #83
-    sty screen_ptr
-    jsr display_clock_weekday
-
-    jmp loop
+    rts
 }
 
 .pin charset $2000
-.pin charset_inverted $2400
-
 
 .section zero_page
 

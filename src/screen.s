@@ -10,19 +10,18 @@
         .data "  ":screen_inverted, "<££££££££££££££>":screen, "    ":screen_inverted, "<££££££££££££££>":screen, "  ":screen_inverted
         .data "                                        ":screen_inverted
     }
-    .repeat 7 {
+    .repeat 6 {
         .data "                                        ":screen_inverted
     }
+    .data "                                   t'pau":screen_inverted
 }
 
 .public main_color {
     .repeat 3 {
-        .data .fill(40, $c)
-        .data .fill(40, $c)
-        .data $c, $c, .fill(16, $b), $c, $c, $c, $c, .fill(16, $b), $c, $c
-        .data $c, $c, .fill(16, $b), $c, $c, $c, $c, .fill(16, $b), $c, $c
-        .data .fill(40, $c)
-        .data .fill(40, $c)
+        .data .fill(40, NAME_COLOR)
+        .data .fill(40, FRAME_COLOR)
+        .data .fill(80, CLOCK_COLOR)
+        .data .fill(80, FRAME_COLOR)
     }
-    .data .fill(7*40, $c)
+    .data .fill(7*40 -5, NAME_COLOR), .fill(5, TPAU_COLOR)
 }
