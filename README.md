@@ -9,5 +9,6 @@ It is currently in the early stages of development and not yet functional.
 - CMD FD with Real Time Clock module
 - CMD HD
 - CMD RAMLink
+- CMD SmartMouse or SmartTrack
 - IDE64
 - SD2IEC with Real Time Clock

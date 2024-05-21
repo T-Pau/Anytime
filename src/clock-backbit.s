@@ -22,7 +22,7 @@
 ;   A: clock parameter (not used)
 ;   X: clock index
 ; Returns: -
-.public clock_backbit_read {
+clock_backbit_read {
     sei
     sta BACKBIT_COMMAND_SUFFIX
     sta BACKBIT_GET_RTC

@@ -15,7 +15,7 @@ clocks_init {
     sta clocks_count
     jsr clock_backbit_detect
     jsr clock_iec_detect
-    ; TODO: detect others
+    jsr clock_smartmouse_detect
 
     lda clocks_count
     cmp #MAX_CLOCK_DISPLAYS
@@ -71,8 +71,9 @@ read:
 }
 
 
-; X/Y: pointer to clock info
-; A: parameter
+; Register clock
+; Arguments:
+;   X/Y: pointer to clock info
 clock_register {
     stx ptr
     sty ptr + 1

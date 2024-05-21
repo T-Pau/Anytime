@@ -9,9 +9,11 @@ sources :=
     clock.s
     clock-backbit.s
     clock-iec.s
+    clock-smartmouse.s
     display-clock.s
     iec.s
     screen.s
+    smartmouse.s
     start.s
 
 build anytime.prg | anytime.prg.sym: link $sources
