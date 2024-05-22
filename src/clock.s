@@ -16,6 +16,7 @@ clocks_init {
     jsr clock_backbit_detect
     jsr clock_iec_detect
     jsr clock_smartmouse_detect
+    ; jsr clock_ds3231_detect
 
     lda clocks_count
     cmp #MAX_CLOCK_DISPLAYS

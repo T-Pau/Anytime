@@ -35,23 +35,17 @@ clock_smartmouse_read {
     sta minute,x
     lda smartmouse_data + 2
     bpl hours_24
+    and #$20
+    sta am_pm,x
+    lda smartmouse_data + 2
     and #$1f
     sta hour,x
-    lda smartmouse_data + 2
-    and #$20
-    beq hour_done
-    sei
-    sed
-    lda hour,x
-    clc
-    adc #12
-    sta hour,x
-    cld
-    cli
     bne hour_done
 hours_24:
     and #$2f
     sta hour,x
+    lda #0
+    sta am_pm,x
 hour_done:
     lda smartmouse_data + 3
     sta day,x
@@ -95,7 +89,7 @@ clock_smartmouse_name {
 
 clock_smartmouse_info {
     .data $01 ; parameter
-    .data CLOCK_FLAG_WEEKDAY | CLOCK_FLAG_24_HOURS ; flags
+    .data CLOCK_FLAG_WEEKDAY ; flags
     .data clock_smartmouse_name
     .data $0000 ; open
     .data clock_smartmouse_read ; read
