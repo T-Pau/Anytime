@@ -70,6 +70,8 @@ hours_24:
     sta am_pm,x
 hour_done:
     lda ds3231_data + DS3231_WEEKDAY
+    sec
+    sbc #1
     sta weekday,x
     lda ds3231_data + DS3231_DAY
     sta day,x
@@ -78,12 +80,6 @@ hour_done:
     sta month,x
     lda ds3231_data + DS3231_YEAR
     sta year,x
-    ldy #$19
-    lda ds3231_data + DS3231_MONTH
-    bpl :+
-    iny
-:   tya
-    sta century,x
     rts
 }
 
@@ -141,7 +137,7 @@ clock_ds3231_name {
 
 clock_ds3231_info {
     .data $01 ; parameter
-    .data CLOCK_FLAG_WEEKDAY | CLOCK_FLAG_CENTURY ; flags
+    .data CLOCK_FLAG_WEEKDAY ; flags
     .data clock_ds3231_name
     .data $0000 ; open
     .data clock_ds3231_read ; read
