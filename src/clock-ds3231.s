@@ -13,8 +13,6 @@ DS3231_SIZE = 7
 ; Arguments: -
 ; Returns: -
 .public clock_ds3231_detect {
-    jsr i2c_init
-    bne end
     lda #1
     jsr detect_ds3231
     lda #2
@@ -30,6 +28,7 @@ end:
 ;   X: clock index
 ; Returns: -
 clock_ds3231_read {
+    jsr set_ds3231_pins
     jsr read_ds3231
     beq :+
     ldx clocks_current
@@ -83,18 +82,22 @@ hour_done:
 ; Helper Routines
 ; -------------------------------------------------------
 
+; Set correct I2C pins
 ; Read clock data from DS3231 into ds3231_data
 ; Arguments:
 ;   A: parameter (bits used for I2C)
-; Returns:
-;   Z: set on success
-read_ds3231 {
+set_ds3231_pins {
     tax
     dex
     lda ds3231_sda,x
     ldy ds3231_scl,x
-    jsr i2c_set_bits
+    jmp i2c_set_bits
+}
 
+; Read clock data from DS3231 into ds3231_data
+; Returns:
+;   Z: set on success
+read_ds3231 {
     ldx #<ds3231_data
     ldy #>ds3231_data
     lda #DS3231_SIZE
@@ -108,12 +111,17 @@ read_ds3231 {
 
 detect_ds3231 {
     sta clock_ds3231_info
+    jsr set_ds3231_pins
+    jsr i2c_init
+    bne end
+    lda clock_ds3231_info
     jsr ds3231_read_clock
-    beq :+
-    rts
-:   ldx #<clock_ds3231_info
+    bne end
+    ldx #<clock_ds3231_info
     ldy #>clock_ds3231_info
     jmp clock_register
+end:
+    rts
 }
 
 .section data
@@ -132,11 +140,11 @@ clock_ds3231_info {
 }
 
 ds3231_sda {
-    .byte $00, $00 ; TODO
+    .byte $04, $01
 }
 
 ds3231_scl {
-    .byte $00, $00 ; TODO
+    .byte $08, $02
 }
 
 .section reserved
