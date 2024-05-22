@@ -11,12 +11,14 @@ sources :=
     clock-ds3231.s
     clock-iec.s
     clock-smartmouse.s
+    clock-ultimate.s
     display-clock.s
     i2c.s
     iec.s
     screen.s
     smartmouse.s
     start.s
+    ultimate-ci.s
 
 build anytime.prg | anytime.prg.sym: link $sources
     target = c64-basic
