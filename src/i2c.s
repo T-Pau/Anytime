@@ -37,8 +37,8 @@ scl_set .reserve 1
 sda_clear .reserve 1
 scl_clear .reserve 1
 
-status .reserve 1
-data .reserve 1
+i2c_status .reserve 1
+i2c_data .reserve 1
 
 
 ; sda_p    = %00000100 ;CIA Port b2 (UP E)
@@ -166,7 +166,7 @@ sda_read {
 ; Preserves: X, Y
 scl_read {
     lda datareg
-    and #scl_set
+    and scl_set
     beq :+
     sec
     rts
@@ -220,7 +220,7 @@ write:
 ;   A: response code
 .public i2c_init {
     lda #ret_ok
-    sta status
+    sta i2c_status
 
     ;TODO: does it make sense to
     ;write these before setting
@@ -242,7 +242,7 @@ chksda:
     bcs chkscl
 
     lda #err_sdalo
-    sta status
+    sta i2c_status
     bne init
 
 chkscl:
@@ -250,7 +250,7 @@ chkscl:
     bcs init
 
     lda #err_scllo
-    sta status
+    sta i2c_status
 
 init:
     jsr both_out
@@ -261,10 +261,10 @@ init:
 
     ;Send stop just in case...
     ;st2 = write_stop_bit();
-    ;if (status == RET_OK)
-    ;status = st2;
+    ;if (i2c_status == RET_OK)
+    ;i2c_status = st2;
 
-    lda status
+    lda i2c_status
     rts
 }
 
@@ -391,7 +391,7 @@ i2c_nack {
 ;   A: byte
 i2c_readb {
     lda #0    ;initialize data byte
-    sta data
+    sta i2c_data
 
     jsr sda_in
     jsr scl_out
@@ -411,7 +411,7 @@ loop:
     jsr delay
 
     jsr sda_read
-    rol data
+    rol i2c_data
 
     ;carry low from rol
     jsr scl_write
@@ -420,7 +420,7 @@ loop:
     dex
     bpl loop
 
-    lda data
+    lda i2c_data
     rts
 }
 
@@ -450,7 +450,7 @@ loop:
 ; Returns:
 ;   A: ack status
 i2c_writeb {
-    sta data
+    sta i2c_data
 
     ;if should write an address,
     ;then rw_bit needs to be added.
@@ -461,7 +461,7 @@ i2c_writeb {
     bmi skiprw
 
     lsr a    ;rwbit -> c
-    rol data ;data  <- c
+    rol i2c_data ;data  <- c
 
 skiprw:
     jsr both_out
@@ -469,7 +469,7 @@ skiprw:
     ldx #7
 
 loop:
-    rol data
+    rol i2c_data
     jsr sda_write
 
     jsr delay
@@ -648,7 +648,7 @@ i2c_writereg {
     sty reg
 
     lda #ret_ok
-    sta status
+    sta i2c_status
 
     jsr i2c_start
 
@@ -679,7 +679,7 @@ loop:
     ldx #purebyte
     jsr i2c_writeb
 
-    ora status
+    ora i2c_status
 
     iny
     cpy regsz
@@ -692,7 +692,7 @@ loop:
     sta bufptr
 
     jsr i2c_stop
-    lda status
+    lda i2c_status
 
     rts
 }

@@ -27,35 +27,36 @@ clock_smartmouse_read {
     ldx #>smartmouse_data
     stx ptr + 1
     jsr smartmouse_read_clock
+
     ldx clocks_current
-    lda smartmouse_data
+    lda smartmouse_data + SMARTMOUSE_CLOCK_SECOND
     and #$7f
     sta second,x
-    lda smartmouse_data + 1
+    lda smartmouse_data + SMARTMOUSE_CLOCK_MINUTE
     sta minute,x
-    lda smartmouse_data + 2
+    lda smartmouse_data + SMARTMOUSE_CLOCK_HOUR
     bpl hours_24
-    and #$20
+    and #SMARTMOUSE_CLOCK_PM
     sta am_pm,x
-    lda smartmouse_data + 2
+    lda smartmouse_data + SMARTMOUSE_CLOCK_HOUR
     and #$1f
     sta hour,x
-    bne hour_done
-hours_24:
-    and #$2f
+    jmp hour_done
+ hours_24:
+    and #$3f
     sta hour,x
     lda #0
     sta am_pm,x
 hour_done:
-    lda smartmouse_data + 3
+    lda smartmouse_data + SMARTMOUSE_CLOCK_DAY
     sta day,x
-    lda smartmouse_data + 4
+    lda smartmouse_data + SMARTMOUSE_CLOCK_MONTH
     sta month,x
-    lda smartmouse_data + 5
+    lda smartmouse_data + SMARTMOUSE_CLOCK_WEEKDAY
     sec
     sbc #1
     sta weekday,x
-    lda smartmouse_data + 6
+    lda smartmouse_data + SMARTMOUSE_CLOCK_YEAR
     sta year,x
     rts
 }

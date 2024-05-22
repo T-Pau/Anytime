@@ -8,11 +8,11 @@ sources :=
     charset.s
     clock.s
     clock-backbit.s
-#    clock-ds3231.s
+    clock-ds3231.s
     clock-iec.s
     clock-smartmouse.s
     display-clock.s
-#    i2c.s
+    i2c.s
     iec.s
     screen.s
     smartmouse.s

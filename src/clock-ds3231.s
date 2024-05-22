@@ -2,6 +2,17 @@
 DS3231_ADDRESS = $68
 DS3231_SIZE = 7
 
+DS3231_SECOND = 0
+DS3231_MINUTE = 1
+DS3231_HOUR = 2
+  DS3231_HOURS_12 = $40
+  DS3231_PM = $20
+DS3231_WEEKDAY = 3
+DS3231_DAY = 4
+DS3231_MONTH = 5
+  DS3231_CENTURY = $80
+DS3231_YEAR = 6
+
 
 .section code
 
@@ -37,40 +48,38 @@ clock_ds3231_read {
     rts
 
 :   ldx clocks_current
-    lda ds3231_data
-    and #$7f
+    lda ds3231_data + DS3231_SECOND
     sta second,x
-    lda ds3231_data + 1
+    lda ds3231_data + DS3231_MINUTE
     sta minute,x
-    lda ds3231_data + 2
-    and #$40
+    lda ds3231_data + DS3231_HOUR
+    and #DS3231_HOURS_12
     beq hours_24
-    lda ds3231_data + 2
+    lda ds3231_data + DS3231_HOUR
     and #$1f
     sta hour,x
-    lda ds3231_data + 2
-    and #$20
+    lda ds3231_data + DS3231_HOUR
+    and #DS3231_PM
     sta am_pm,x
-    bne hour_done
+    jmp hour_done
 hours_24:
-    lda ds3231_data + 2
-    and #$2f
+    lda ds3231_data + DS3231_HOUR
+    and #$3f
     sta hour,x
     lda #0
     sta am_pm,x
 hour_done:
-    lda ds3231_data + 3
-    sta day,x
-    lda ds3231_data + 4
-    sta month,x
-    lda ds3231_data + 5
-    sec
-    sbc #1
+    lda ds3231_data + DS3231_WEEKDAY
     sta weekday,x
-    ldy #$19
-    lda ds3231_data + 6
+    lda ds3231_data + DS3231_DAY
+    sta day,x
+    lda ds3231_data + DS3231_MONTH
+    and #$7f
+    sta month,x
+    lda ds3231_data + DS3231_YEAR
     sta year,x
-    lda ds3231_data + 6
+    ldy #$19
+    lda ds3231_data + DS3231_MONTH
     bpl :+
     iny
 :   tya
@@ -115,7 +124,7 @@ detect_ds3231 {
     jsr i2c_init
     bne end
     lda clock_ds3231_info
-    jsr ds3231_read_clock
+    jsr read_ds3231
     bne end
     ldx #<clock_ds3231_info
     ldy #>clock_ds3231_info
@@ -140,11 +149,11 @@ clock_ds3231_info {
 }
 
 ds3231_sda {
-    .byte $04, $01
+    .data $04, $01
 }
 
 ds3231_scl {
-    .byte $08, $02
+    .data $08, $02
 }
 
 .section reserved

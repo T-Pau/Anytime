@@ -16,7 +16,7 @@ clocks_init {
     jsr clock_backbit_detect
     jsr clock_iec_detect
     jsr clock_smartmouse_detect
-    ; jsr clock_ds3231_detect
+    jsr clock_ds3231_detect
 
     lda clocks_count
     cmp #MAX_CLOCK_DISPLAYS
@@ -137,9 +137,9 @@ century_ok:
     lda am_pm,x
     beq end
     lda hour,x
-    clc
     sei
     sed
+    clc
     adc #$12
     cld
     cli
