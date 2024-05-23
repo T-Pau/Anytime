@@ -153,7 +153,10 @@ no_number:
 ; Preserves: -
 .public display_clock {
     setup_clock_display_position
-    lda clocks_flags,x
+    lda status,x
+    beq :+
+    jmp display_clock_invalid
+:   lda clocks_flags,x
     bpl no_weekday
     ldy #0
     lda weekday,x
@@ -206,6 +209,72 @@ time:
     lda second,x
     jmp display_bcd
 }
+
+; Display invalid clock.
+; Arguments:
+;   X: clock index
+; Returns: -
+; Preserves: -
+display_clock_invalid {
+    lda #$2d ; '-':screen
+    ldy clocks_flags,x
+    bpl no_weekday
+    ldy #0
+    sta (screen_ptr),y
+    iny
+    sta (screen_ptr),y
+    iny
+    sta (screen_ptr),y
+    iny
+    iny
+    bne date
+no_weekday:
+    ldy #2
+date:
+    sta (screen_ptr),y
+    iny
+    sta (screen_ptr),y
+    iny
+    iny
+    sta (screen_ptr),y
+    iny
+    sta (screen_ptr),y
+    iny
+    iny
+    sta (screen_ptr),y
+    iny
+    sta (screen_ptr),y
+    iny
+    sta (screen_ptr),y
+    iny
+    sta (screen_ptr),y
+
+    ldy #43
+    lda clocks_flags,x
+    and #1
+    beq time
+    ldy #51
+    lda #$2d ; '-':screen
+    sta (screen_ptr),y
+    ldy #42
+time:
+    lda #$2d ; '-':screen
+    sta (screen_ptr),y
+    iny
+    sta (screen_ptr),y
+    iny
+    iny
+    sta (screen_ptr),y
+    iny
+    sta (screen_ptr),y
+    iny
+    iny
+    sta (screen_ptr),y
+    iny
+    sta (screen_ptr),y
+    rts
+}
+
 
 .public display_bcd {
     sta display_tmp

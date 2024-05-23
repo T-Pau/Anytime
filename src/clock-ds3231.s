@@ -80,6 +80,8 @@ hour_done:
     sta month,x
     lda ds3231_data + DS3231_YEAR
     sta year,x
+    lda #0
+    sta status,x
     rts
 }
 

@@ -69,6 +69,8 @@ hour_done:
     sta weekday,x
     lda #$20
     sta century,x
+    lda #0
+    sta status,x
     rts
 }
 

@@ -83,6 +83,8 @@ error:
     sta second,x
     lda iec_response + 7
     sta am_pm,x
+    lda #0
+    sta status,x
     rts
 }
 

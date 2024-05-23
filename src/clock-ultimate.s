@@ -23,6 +23,8 @@
 ;   X: clock index
 ; Returns: -
 clock_ultimate_read {
+    lda #CLOCK_STATUS_ERROR
+    sta status,x
     rts ; TODO: fix and reenable
     ldx #<ultimate_command
     ldy #>ultimate_command

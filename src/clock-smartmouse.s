@@ -58,6 +58,8 @@ hour_done:
     sta weekday,x
     lda smartmouse_data + SMARTMOUSE_CLOCK_YEAR
     sta year,x
+    lda #0
+    sta status,x
     rts
 }
 

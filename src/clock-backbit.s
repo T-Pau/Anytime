@@ -27,8 +27,6 @@ clock_backbit_read {
     sta BACKBIT_COMMAND_SUFFIX
     sta BACKBIT_GET_RTC
 
-    lda #$ff
-    sta weekday,x
     ldy #0
 
 :   jsr backbit_detect
@@ -55,6 +53,8 @@ clock_backbit_read {
     lda BACKBIT_RTC_SUB_SECOND
     sta sub_second,x
     cli
+    lda #0
+    sta status,x
     rts
 }
 
