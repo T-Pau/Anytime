@@ -73,8 +73,8 @@ This module connects to the user port.
 
 There are two variants supported: 
 
-- #1 is compatible with GEOS; it uses pins C and D.
+- #1 can be used together with an RS-232 serial port; it uses pins E and F.
 
-- #2 can be used together with an RS-232 serial port; it uses pins E and F.
+- #2 is compatible with GEOS; it uses pins C and D.
 
 Its clock stores the current weekday and the year as two digits without century.
