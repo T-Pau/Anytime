@@ -10,6 +10,7 @@ sources :=
     clock-backbit.s
     clock-ds3231.s
     clock-iec.s
+    clock-mega65.s
     clock-smartmouse.s
     clock-ultimate.s
     display-clock.s
@@ -22,7 +23,7 @@ sources :=
 
 build anytime.prg | anytime.prg.sym: link $sources
     target = c64-basic
-    libs = cbm.lib c64.lib
+    libs = cbm.lib mega65.lib
 
 build anytime.prg.ll: vice-ll anytime.prg.sym
 

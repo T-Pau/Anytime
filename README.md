@@ -13,6 +13,7 @@ It is currently in the early stages of development. Setting clocks is not yet su
 - CMD RAMLink
 - CMD SmartMouse and SmartTrack
 - IDE64
+- MEGA65
 - SD2IEC with Real Time Clock
 - User Port DS3231 Real Time Clock Module
 

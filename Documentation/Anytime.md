@@ -15,6 +15,7 @@ Load the program from the disc image with `LOAD"*",8,1`. On C128 and MEGA65, swi
 - CMD RAMLink
 - CMD SmartMouse and SmartTrack
 - IDE64
+- MEGA65
 - SD2IEC with Real Time Clock
 - User Port DS3231 Real Time Clock Module
 
@@ -54,6 +55,12 @@ This hard disk connects to cartridge port.
 
 Its clock stores the current weekday and the year as two digits without century.
 
+### MEGA65
+
+This computer has a built-in clock.
+
+It stores the year as two digits without century. 
+
 ### SD2IEC
 
 This drive connects to the IEC bus. Most models don't include a real time clock.
@@ -64,6 +71,10 @@ Its clock stores the current weekday and the year as two digits without century.
 
 This module connects to the user port.
 
-There are two variants supported: One is compatible with GEOS, the other can be used together with an RS-232 serial port.
+There are two variants supported: 
+
+- #1 is compatible with GEOS; it uses pins C and D.
+
+- #2 can be used together with an RS-232 serial port; it uses pins E and F.
 
 Its clock stores the current weekday and the year as two digits without century.

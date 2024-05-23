@@ -14,6 +14,7 @@ clocks_init {
     lda #0
     sta clocks_count
     jsr clock_ultimate_detect
+    jsr clock_mega65_detect
     jsr clock_backbit_detect
     jsr clock_iec_detect
     jsr clock_smartmouse_detect
