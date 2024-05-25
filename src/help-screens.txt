@@ -1,0 +1,122 @@
+;  help-screen.s -- Text for help screens.
+;
+;  Copyright (C) Dieter Baron
+;
+; This file is part of Anytime, a program to manage real time clocks for C64.
+; The authors can be contacted at <anytime@tpau.group>.
+;
+;  Redistribution and use in source and binary forms, with or without
+;  modification, are permitted provided that the following conditions
+;  are met:
+;  1. Redistributions of source code must retain the above copyright
+;     notice, this list of conditions and the following disclaimer.
+;  2. The names of the authors may not be used to endorse or promote
+;     products derived from this software without specific prior
+;     written permission.
+;
+;  THIS SOFTWARE IS PROVIDED BY THE AUTHORS "AS IS" AND ANY EXPRESS
+;  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+;  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+;  ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+;  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+;  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+;  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+;  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+;  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+;  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+name help_screens
+
+map $40-$5a $00
+map $61-$7a $01
+map $20-$3f $20
+
+line_length 38
+lines 18
+line_skip 2
+title_length 38
+title_xor 128
+assembler xlr8
+word_wrap 1
+
+---
+Anytime
+
+This program automatically detects supported real time clocks connected to your Commodore 64 and continuously displays them.
+
+This is Anytime ${VERSION}. The newest version and further information can be found at
+   https://github.com/T-Pau/Joyride
+---
+Supported Devices
+
+- BackBit Cartridge
+- CMD FD-2000 with Real Time Clock module
+- CMD FD-4000
+- CMD HD
+- CMD RAMLink
+- CMD SmartMouse and SmartTrack
+- IDE64
+- MEGA65
+- SD2IEC with Real Time Clock
+- User Port DS3231 Real Time Clock Module
+---
+BackBit Cartridge
+
+BackBit connects to the cartridge port.
+
+Its clock stores the year as four digits, including century but not the current weekday.
+---
+CMD FD-2000 and FD-4000
+
+These floppy drives connect to the IEC bus. The real time clock module is optional on the FD-2000.
+
+Their clocks store the current weekday and the year as two digits without century.
+---
+CMD FD-HD
+
+This hard drive connects to the IEC bus.
+
+Its clock stores the current weekday and the year as two digits without century.
+---
+CMD RAMLink
+
+This RAM disk connects to cartridge port.
+
+Its clock stores the current weekday and the year as two digits without century.
+---
+CMD SmartMouse and SmartTrack
+
+These mice or trackballs connect to either controller port.
+
+Their clocks store the current weekday and the year as two digits without century.
+---
+IDE64
+
+This hard disk connects to cartridge port.
+
+Its clock stores the current weekday and the year as two digits without century.
+---
+MEGA65
+
+This computer has a built-in clock.
+
+It stores the year as two digits without century.
+---
+SD2IEC
+
+This drive connects to the IEC bus. Most models don't include a real time clock.
+
+Its clock stores the current weekday and the year as two digits without century.
+---
+User Port DS3231 Module
+
+This module connects to the user port.
+
+There are two variants supported:
+
+- #1 can be used together with an RS-232 serial port; it uses pins E and F.
+
+- #2 is compatible with GEOS; it uses pins C and D.
+
+Its clock stores the current weekday and the year as two digits without century.

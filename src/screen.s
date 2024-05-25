@@ -26,30 +26,90 @@
 ; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 ; IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.section data
+screen = $0400
+.pin charset $2000
+color_ram = $d800
 
-.public main_screen {
-    ;      1234567890123456789012345678901234567890
-    .repeat 3 {
-        .data "                                        ":screen_inverted
-        .data "  ":screen_inverted, "[              ]":screen, "    ":screen_inverted, "[              ]":screen, "  ":screen_inverted
-        .data "  ":screen_inverted, "                ":screen, "    ":screen_inverted, "                ":screen, "  ":screen_inverted
-        .data "  ":screen_inverted, "                ":screen, "    ":screen_inverted, "                ":screen, "  ":screen_inverted
-        .data "  ":screen_inverted, "<££££££££££££££>":screen, "    ":screen_inverted, "<££££££££££££££>":screen, "  ":screen_inverted
-        .data "                                        ":screen_inverted
-    }
-    .repeat 6 {
-        .data "                                        ":screen_inverted
-    }
-    .data "                                   t'pau":screen_inverted
+source_ptr = ptr
+destination_ptr = screen_ptr
+
+.section code
+
+; Set up VIC.
+setup_display {
+    lda #VIC_VIDEO_ADDRESS(screen, charset)
+    sta VIC_VIDEO_ADDRESS
+
+    lda #FRAME_COLOR
+    sta VIC_BORDER_COLOR
+    sta VIC_BACKGROUND_COLOR_2
+    lda #BACKGROUND_COLOR
+    sta VIC_BACKGROUND_COLOR
+    lda VIC_CONTROL_1
+    ora #VIC_EXTENDED_BACKGROUND_COLOR
+    sta VIC_CONTROL_1
+    rts
 }
+
+; Display detecting clocks screen.
+display_detect {
+    display_screen detect_screen, detect_color
+    rts
+}
+
+; Display main screen.
+display_main {
+    display_screen main_screen, main_color
+    rts
+}
+
+; Display help scren.
+display_help {
+    display_screen help_screen, help_color
+    rts
+}
+
+; Display screen runlength encoded screen and color data.
+.macro display_screen screen_rl, color_rl {
+    store_word source_ptr, screen_rl
+    store_word destination_ptr, screen
+    jsr rl_expand
+    store_word source_ptr, color_rl
+    store_word destination_ptr, color_ram
+    jsr rl_expand
+}
+
+
+.section zero_page
+
+screen_ptr .reserve 2
+
+.section data
 
 .public main_color {
     .repeat 3 {
-        .data .fill(40, NAME_COLOR)
-        .data .fill(40, FRAME_COLOR)
-        .data .fill(80, CLOCK_COLOR)
-        .data .fill(80, FRAME_COLOR)
+        rl_encode 40, NAME_COLOR
+        rl_encode 40, FRAME_COLOR
+        rl_encode 80, CLOCK_COLOR
+        rl_encode 80, FRAME_COLOR
     }
-    .data .fill(7*40 -5, NAME_COLOR), .fill(5, TPAU_COLOR)
+    rl_encode 7*40 - 5, NAME_COLOR
+    rl_encode 5, TPAU_COLOR
+    rl_end
+}
+
+.public help_color {
+    rl_encode 40, NAME_COLOR
+    rl_encode 40, FRAME_COLOR
+    rl_encode 18 * 40, CLOCK_COLOR
+    rl_encode 40, FRAME_COLOR
+    rl_encode 4 * 40 - 5, NAME_COLOR
+    rl_encode 5, TPAU_COLOR
+    rl_end
+}
+
+.public detect_color {
+    rl_encode 25 * 40 - 5, PARAMETER_COLOR
+    rl_encode 5, TPAU_COLOR
+    rl_end
 }

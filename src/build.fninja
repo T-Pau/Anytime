@@ -4,6 +4,8 @@ include ../Toolkit/fast-ninja/xlr8.fninja
 include ../Toolkit/fast-ninja/scripts.fninja
 
 sources :=
+    ../Toolkit/xlr8/6502/rl-expand.s
+    ../Toolkit/xlr8/6502/utility.s
     backbit.s
     charset.s
     clock.s
@@ -13,7 +15,12 @@ sources :=
     clock-mega65.s
     clock-smartmouse.s
     clock-ultimate.s
+    detect-screen.s
     display-clock.s
+    help.s
+    help-screen.s
+    help-screens.s
+    main-screen.s
     i2c.s
     iec.s
     screen.s
@@ -31,4 +38,9 @@ build charset.s: convert-charset charset.png
     flags = -i
     name = charset
 
+build detect-screen.s: convert-screens detect-screen.txt
+build help-screen.s: convert-screens help-screen.txt
+build main-screen.s: convert-screens main-screen.txt
+
 build help-screens.s: convert-screens help-screens.txt
+    flags = -DVERSION=$VERSION

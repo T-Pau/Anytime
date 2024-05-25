@@ -1,4 +1,4 @@
-; start.s -- main routine
+; help.s -- Display help pages
 ;
 ; Copyright (C) Dieter Baron
 ;
@@ -26,26 +26,78 @@
 ; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 ; IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+HELP_SCREEN_TITLE_OFFSET = 1
+HELP_SCREEN_TEXT_OFFSET = 81
+
+HELP_KEY_RETURN = $5f
+HELP_KEY_NEXT_1 = $20
+HELP_KEY_NEXT_2 = $2b
+HELP_KEY_PREVIOUS = $2d
+
+.section reserved
+
+help_current_page .reserve 1
+
 .section code
 
-KEY_HELP = $88 ; F7
-
-.public start {
-    jsr setup_display
-    jsr display_detect
-    jsr clocks_init
-    jmp main
-}
-
-main {
-    jsr display_main
-    jsr clocks_init_display
+help {
+    jsr display_help
+    ldx #0
+    jsr help_display_page
 loop:
-    jsr clocks_update
     jsr GETIN
     beq loop
-    cmp #KEY_HELP
+    cmp #HELP_KEY_RETURN
     bne :+
-    jmp help
-:   jmp loop
+    jmp main
+:   cmp #HELP_KEY_NEXT_1
+    bne :+
+next_page:
+    jsr help_next_page
+    jmp loop
+:   cmp #HELP_KEY_NEXT_2
+    beq next_page
+    cmp #HELP_KEY_PREVIOUS
+    bne loop
+    jsr help_previous_page
+    jmp loop
+}
+
+; Display help page.
+; Arguments:
+;   X: page to display
+help_display_page {
+    stx help_current_page
+    txa
+    asl
+    tax
+    lda help_screens,x
+    sta source_ptr
+    lda help_screens + 1,x
+    sta source_ptr + 1
+    store_word destination_ptr, screen + HELP_SCREEN_TITLE_OFFSET
+    jsr rl_expand
+    store_word destination_ptr, screen + HELP_SCREEN_TEXT_OFFSET
+    jmp rl_expand
+}
+
+; Go to next help page.
+help_next_page {
+    ldx help_current_page
+    inx
+    cpx help_screens_count
+    bne :+
+    ldx #0
+:   jmp help_display_page
+}
+
+; Go to previous help page.
+help_previous_page {
+    ldx help_current_page
+    dex
+    cpx #$ff
+    bne :+
+    ldx help_screens_count
+    dex
+:   jmp help_display_page
 }
