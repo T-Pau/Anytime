@@ -1,6 +1,8 @@
 # Anytime
 
-Program to read and set real time clocks for the Commodore 64.
+![Screenshot](screenshot.png)
+
+This program automatically detects supported real time clocks connected to your Commodore 64 and continuously displays them.
 
 It is currently in the early stages of development. Setting clocks is not yet supported.
 
