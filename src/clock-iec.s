@@ -99,11 +99,22 @@ error:
     cmp #8
     bne error
 
-    ldx #7
-:   lda iec_response,x
-    sta clock,x
-    dex
-    bpl :-
+    lda iec_response
+    sta clock_weekday
+    lda iec_response + 1
+    sta clock_year
+    lda iec_response + 2
+    sta clock_month
+    lda iec_response + 3
+    sta clock_day
+    lda iec_response + 4
+    sta clock_hour
+    lda iec_response + 5
+    sta clock_minute
+    lda iec_response + 6
+    sta clock_second
+    lda iec_response + 7
+    sta clock_am_pm
     lda #0
     sta clock_status
     rts

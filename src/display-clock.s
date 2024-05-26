@@ -43,50 +43,21 @@ SCANNING_OFFSET = 13 * 40
 ; Returns: -
 .public setup_clock_display {
     setup_clock_display_position
-    ldy #6
-    lda clocks_flags,x
-    bmi date
-    lda #$20 ; ' ':screen
-    sta (screen_ptr),y
-    iny
-    sta (screen_ptr),y
-    iny
-    ldy #4
-date:
-    lda #$2f ; "/":screen
-    sta (screen_ptr),y
-    iny
-    iny
-    iny
-    lda #$2f ; '/':screen
-    sta (screen_ptr),y
-
-    lda clocks_flags,x
-    and #1
-    beq no_sub_second
-    ldy #50
-    lda #$2e ; '.':screen
-    sta (screen_ptr),y
-    ldy #44
-    bne time
-no_sub_second:
-    lda #$20 ; ' ':screen
-    ldy #42
-    sta (screen_ptr),y
-    ldy #51
-    sta (screen_ptr),y
-    ldy #45
-time:
-    lda #$3a ; ':':screen
-    sta (screen_ptr),y
-    iny
-    iny
-    iny
-    lda #$3a
-    sta (screen_ptr),y
-
-    sec
     lda screen_ptr
+    sec
+    sbc #41
+    sta screen_ptr
+    bcs :+
+    dec screen_ptr + 1
+:   store_word ptr, clock_frame
+    jsr rl_expand
+
+    ; TODO: set up colors based on flags
+
+    ldx clocks_current
+    setup_clock_display_position
+    lda screen_ptr
+    sec
     sbc #80
     sta screen_ptr
     sta ptr
@@ -186,9 +157,8 @@ no_number:
     lda clock_status
     beq :+
     jmp display_clock_invalid
-:   lda clocks_flags,x
-    bpl no_weekday
-    ldy #0
+:   ldy #0
+
     lda clock_weekday
     asl
     asl
@@ -204,10 +174,7 @@ no_number:
     iny
     ldx clocks_current
     iny
-    bne date
-no_weekday:
-    ldy #2
-date:
+
     lda clock_day
     jsr display_bcd
     iny
@@ -220,16 +187,6 @@ date:
     jsr display_bcd
 
     ldy #43
-    lda clocks_flags,x
-    and #1
-    beq time
-    ldy #51
-    lda clock_sub_second
-    and #$0f
-    ora #$30
-    sta (screen_ptr),y
-    ldy #42
-time:
     lda clock_hour
     jsr display_bcd
     iny
@@ -248,7 +205,6 @@ time:
 display_clock_invalid {
     lda #$2d ; '-':screen
     ldy clocks_flags,x
-    bpl no_weekday
     ldy #0
     sta (screen_ptr),y
     iny
@@ -257,10 +213,7 @@ display_clock_invalid {
     sta (screen_ptr),y
     iny
     iny
-    bne date
-no_weekday:
-    ldy #2
-date:
+
     sta (screen_ptr),y
     iny
     sta (screen_ptr),y
@@ -280,15 +233,6 @@ date:
     sta (screen_ptr),y
 
     ldy #43
-    lda clocks_flags,x
-    and #1
-    beq time
-    ldy #51
-    lda #$2d ; '-':screen
-    sta (screen_ptr),y
-    ldy #42
-time:
-    lda #$2d ; '-':screen
     sta (screen_ptr),y
     iny
     sta (screen_ptr),y
@@ -498,6 +442,28 @@ done:
 
 .section data
 
+CLOCK_FRAME_WIDTH = 16
+CLOCK_FRAME_HEIGHT = 4
+
+clock_frame {
+    .data "[":screen
+    rl_encode CLOCK_FRAME_WIDTH - 2, $20 ; ' ':screen
+    .data "]":screen
+    rl_skip 40 - CLOCK_FRAME_WIDTH
+    rl_encode 7, $20 ; ' ':screen
+    .data "/  /":screen
+    rl_encode 5, $20 ; ' ':screen
+    rl_skip 40 - CLOCK_FRAME_WIDTH
+    rl_encode 6, $20 ; ' ':screen
+    .data ":  :":screen
+    rl_encode 6, $20 ; ' ':screen
+    rl_skip 40 - CLOCK_FRAME_WIDTH
+    .data "<":screen
+    rl_encode CLOCK_FRAME_WIDTH - 2, $1c ; '£':screen
+    .data ">":screen
+    rl_end
+}
+
 weekdays {
     .data "sun":screen, 0
     .data "mon":screen, 0
@@ -507,6 +473,7 @@ weekdays {
     .data "fri":screen, 0
     .data "sat":screen, 0
     .data "sun":screen, 0
+    .data "---":screen, 0
 }
 
 .section reserved

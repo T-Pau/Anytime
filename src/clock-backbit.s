@@ -80,8 +80,6 @@ clock_backbit_read {
     sta clock_minute
     lda BACKBIT_RTC_SECOND
     sta clock_second
-    lda BACKBIT_RTC_SUB_SECOND
-    sta clock_sub_second
     cli
     lda #0
     sta clock_status

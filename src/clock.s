@@ -35,10 +35,9 @@ CLOCK_DAY = 4
 CLOCK_HOUR = 5
 CLOCK_MINUTE = 6
 CLOCK_SECOND = 7
-CLOCK_SUB_SECOND = 8
-CLOCK_AM_PM = 9
-CLOCK_STATUS = 10
-CLOCK_SIZE = 11
+CLOCK_AM_PM = 8
+CLOCK_STATUS = 9
+CLOCK_SIZE = 10
 
 MAX_CLOCK_DISPLAYS = 6
 MAX_CLOCKS = 16
@@ -46,7 +45,6 @@ MAX_CLOCKS = 16
 CLOCK_FLAG_WEEKDAY = $80
 CLOCK_FLAG_CENTURY = $40
 CLOCK_FLAG_24_HOURS = $20
-CLOCK_FLAG_SUB_SECOND = $1
 
 CLOCK_STATUS_ERROR = $80
 
@@ -168,6 +166,17 @@ clock_normalize {
     lda clock_status
     bne end
     lda clocks_flags,x
+    and #CLOCK_FLAG_WEEKDAY
+    bne :+
+    lda #8
+    bne weekday
+:   lda clock_weekday
+weekday:
+    cmp #7
+    bcc :+
+    lda #8
+    sta clock_weekday
+:   lda clocks_flags,x
     and #CLOCK_FLAG_CENTURY
     bne century_ok
     ldy #$20
@@ -240,6 +249,5 @@ clock_day = clock + CLOCK_DAY
 clock_hour = clock + CLOCK_HOUR
 clock_minute = clock + CLOCK_MINUTE
 clock_second = clock + CLOCK_SECOND
-clock_sub_second = clock + CLOCK_SUB_SECOND
 clock_am_pm = clock + CLOCK_AM_PM
 clock_status = clock + CLOCK_STATUS
