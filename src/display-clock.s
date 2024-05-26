@@ -32,6 +32,7 @@ FRAME_COLOR = COLOR_GREY_2
 BACKGROUND_COLOR = COLOR_GREY_3
 NAME_COLOR = COLOR_BLACK
 CLOCK_COLOR = COLOR_GREY_1
+CLOCK_COLOR_SYNTHETIC = COLOR_GREY_2
 
 SCANNING_OFFSET = 13 * 40
 
@@ -42,29 +43,41 @@ SCANNING_OFFSET = 13 * 40
 ;   X: clock index
 ; Returns: -
 .public setup_clock_display {
-    setup_clock_display_position
-    lda screen_ptr
-    sec
-    sbc #41
-    sta screen_ptr
-    bcs :+
-    dec screen_ptr + 1
+    setup_clock_display_position -41
 :   store_word ptr, clock_frame
     jsr rl_expand
 
-    ; TODO: set up colors based on flags
-
     ldx clocks_current
-    setup_clock_display_position
+    setup_clock_display_position 0, .true
+    ldy #CLOCK_COLOR
+    lda clocks_flags,x
+    and #CLOCK_FLAG_WEEKDAY
+    bne :+
+    ldy #CLOCK_COLOR_SYNTHETIC
+    tya
+    ldy #0
+:   sta (screen_ptr),y
+    iny
+    cpy #3
+    bcc :-
+
+    ldy #CLOCK_COLOR
+    lda clocks_flags,x
+    and #CLOCK_CENTURY
+    bne :+
+    ldy #CLOCK_COLOR_SYNTHETIC
+    tya
+    ldy #10
+    sta (screen_ptr),y
+    iny
+    sta (screen_ptr),y
+    iny
+
+    setup_clock_display_position -80
     lda screen_ptr
-    sec
-    sbc #80
-    sta screen_ptr
     sta ptr
     lda screen_ptr + 1
-    sbc #$00
-    sta screen_ptr + 1
-    eor #$dc ; <(screen ^ color_ram)
+    eor #$dc ; >(screen ^ color_ram)
     sta ptr + 1
     lda clocks_name_low,x
     sta ptr2
@@ -433,10 +446,27 @@ done:
 
 ; X: clock index
 ; preserves X
-.macro setup_clock_display_position {
+.macro setup_clock_display_position offset = 0, for_color = .false {
     lda clocks_screen_position_low,x
+    .if offset > 0 {
+        clc
+        adc #<offset
+    }
+    .else_if offset < 0 {
+        sec
+        sbc #<-offset
+    }
     sta screen_ptr
     lda clocks_screen_position_high,x
+    .if offset > 0 {
+        adc #>offset
+    }
+    .else_if offset < 0 {
+        sbc #>-offset
+    }
+    .if for_color {
+        eor #$dc ; >(screen ^ color_ram)
+    }
     sta screen_ptr + 1
 }
 
