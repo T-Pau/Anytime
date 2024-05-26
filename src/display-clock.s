@@ -494,6 +494,13 @@ clock_frame {
     rl_end
 }
 
+no_clocks {
+    rl_encode 40 * 8 + 12, $a0 ; ' ':screen_inverted
+    .data "no clocks found.":screen_inverted
+    rl_encode 40 * 9, $a0 ; ' ':screen_inverted
+    rl_end
+}
+
 weekdays {
     .data "sun":screen, 0
     .data "mon":screen, 0

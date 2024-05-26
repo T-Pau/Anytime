@@ -71,7 +71,12 @@ clocks_init {
 }
 
 clocks_init_display {
-    ldx #0
+    lda clocks_count
+    bne :+
+    store_word source_ptr, no_clocks
+    store_word destination_ptr, screen
+    jmp rl_expand
+:   ldx #0
 loop:
     cpx clocks_active_count
     bne :+
