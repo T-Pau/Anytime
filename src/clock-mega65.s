@@ -51,10 +51,12 @@ MEGA65_RTC = $0ffd7110
 ; Arguments: -
 ; Returns: -
 .public clock_mega65_detect {
+    lda #CLOCK_PARAMETER_NONE
+    load_word clock_mega65_name
+    jsr display_scanning
     jsr mega65_detect
     bne :+
-    ldx #<clock_mega65_info
-    ldy #>clock_mega65_info
+    load_word clock_mega65_info
     jsr clock_register
 :   rts
 }
@@ -69,36 +71,36 @@ clock_mega65_read {
     store_32 quad_ptr, MEGA65_RTC
     ldz #0
     jsr read_register
-    sta second,x
+    sta clock_second
     jsr read_register
-    sta minute,x
+    sta clock_minute
     jsr read_register
     bmi hours_24
     tay
     and #$1f
-    sta hour,x
+    sta clock_hour
     tya
     and #$20
-    sta am_pm,x
+    sta clock_am_pm
     jmp hour_done
 hours_24:
     and #$2f
-    sta hour,x
+    sta clock_hour
     lda #0
-    sta am_pm,x
+    sta clock_am_pm
 hour_done:
     jsr read_register
-    sta day,x
+    sta clock_day
     jsr read_register
-    sta month,x
+    sta clock_month
     jsr read_register
-    sta year,x
+    sta clock_year
     jsr read_register
-    sta weekday,x
+    sta clock_weekday
     lda #$20
-    sta century,x
+    sta clock_century
     lda #0
-    sta status,x
+    sta clock_status
     rts
 }
 

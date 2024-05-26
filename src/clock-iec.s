@@ -43,6 +43,10 @@ IEC_LAST_DEVICE = 16
 loop:
     stx clock_iec_info
     txa
+    load_word name_unknown
+    jsr display_scanning
+    lda clock_iec_info
+    tax
     jsr iec_command_open
     cmp #0
     bne :+
@@ -89,30 +93,19 @@ loop:
     bcc :+
 error:
     lda #CLOCK_STATUS_ERROR
-    sta status,x
+    sta clock_status
     rts
 :   lda iec_response_length
     cmp #8
     bne error
 
-    lda iec_response
-    sta weekday,x
-    lda iec_response + 1
-    sta year,x
-    lda iec_response + 2
-    sta month,x
-    lda iec_response + 3
-    sta day,x
-    lda iec_response + 4
-    sta hour,x
-    lda iec_response + 5
-    sta minute,x
-    lda iec_response + 6
-    sta second,x
-    lda iec_response + 7
-    sta am_pm,x
+    ldx #7
+:   lda iec_response,x
+    sta clock,x
+    dex
+    bpl :-
     lda #0
-    sta status,x
+    sta clock_status
     rts
 }
 

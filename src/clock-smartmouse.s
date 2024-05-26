@@ -56,48 +56,47 @@ clock_smartmouse_read {
     stx ptr + 1
     jsr smartmouse_read_clock
 
-    ldx clocks_current
     lda smartmouse_data + SMARTMOUSE_CLOCK_SECOND
     and #$7f
-    sta second,x
+    sta clock_second
     lda smartmouse_data + SMARTMOUSE_CLOCK_MINUTE
-    sta minute,x
+    sta clock_minute
     lda smartmouse_data + SMARTMOUSE_CLOCK_HOUR
     bpl hours_24
     and #SMARTMOUSE_CLOCK_PM
-    sta am_pm,x
+    sta clock_am_pm
     lda smartmouse_data + SMARTMOUSE_CLOCK_HOUR
     and #$1f
-    sta hour,x
+    sta clock_hour
     jmp hour_done
  hours_24:
     and #$3f
-    sta hour,x
+    sta clock_hour
     lda #0
-    sta am_pm,x
+    sta clock_am_pm
 hour_done:
     lda smartmouse_data + SMARTMOUSE_CLOCK_DAY
-    sta day,x
+    sta clock_day
     lda smartmouse_data + SMARTMOUSE_CLOCK_MONTH
-    sta month,x
+    sta clock_month
     lda smartmouse_data + SMARTMOUSE_CLOCK_WEEKDAY
     sec
     sbc #1
-    sta weekday,x
+    sta clock_weekday
     lda smartmouse_data + SMARTMOUSE_CLOCK_YEAR
-    sta year,x
+    sta clock_year
     lda #0
-    sta status,x
+    sta clock_status
     rts
 }
 
 
 detect_smartmouse {
-    ldx #<smartmouse_data
-    stx ptr
-    ldx #>smartmouse_data
-    stx ptr + 1
     sta clock_smartmouse_info
+    load_word clock_smartmouse_name
+    jsr display_scanning
+    store_word ptr, smartmouse_data
+    lda clock_smartmouse_info
     jsr smartmouse_read_clock
     ldx #SMARTMOUSE_CLOCK_SIZE - 1
 :   lda smartmouse_data,x
@@ -107,8 +106,7 @@ detect_smartmouse {
     bpl :-
     rts
 found:
-    ldx #<clock_smartmouse_info
-    ldy #>clock_smartmouse_info
+    load_word clock_smartmouse_info
     jmp clock_register
 }
 

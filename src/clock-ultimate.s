@@ -36,6 +36,9 @@
 ; Arguments: -
 ; Returns: -
 .public clock_ultimate_detect {
+    lda #CLOCK_PARAMETER_NONE
+    load_word clock_ultimate_name
+    jsr display_scanning
     jsr ultimate_ci_detect
     bne :+
     ldx #<clock_ultimate_info
@@ -52,7 +55,7 @@
 ; Returns: -
 clock_ultimate_read {
     lda #CLOCK_STATUS_ERROR
-    sta status,x
+    sta clock_status
     rts ; TODO: fix and reenable
     ldx #<ultimate_command
     ldy #>ultimate_command
@@ -63,7 +66,7 @@ clock_ultimate_read {
     beq :+
     lda #1
     ldx clocks_current
-    sta status,x
+    sta clock_status
     rts
 :   ldx #<ultimate_data
     ldy #>ultimate_data
@@ -73,27 +76,27 @@ clock_ultimate_read {
     ; TODO: check for end of data, correct length?
 
     lda #0
-    sta weekday,x ; TODO: convert weekday
+    sta clock_weekday ; TODO: convert weekday
     ldy #4
     jsr convert_ascii
-    sta century,x
+    sta clock_century
     jsr convert_ascii
-    sta year,x
+    sta clock_year
     iny
     jsr convert_ascii
-    sta month,x
+    sta clock_month
     iny
     jsr convert_ascii
-    sta day,x
+    sta clock_day
     iny
     jsr convert_ascii
-    sta hour,x
+    sta clock_hour
     iny
     jsr convert_ascii
-    sta minute,x
+    sta clock_minute
     iny
     jsr convert_ascii
-    sta second,x
+    sta clock_second
     rts
 }
 

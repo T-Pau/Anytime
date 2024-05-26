@@ -70,46 +70,44 @@ clock_ds3231_read {
     jsr set_ds3231_pins
     jsr read_ds3231
     beq :+
-    ldx clocks_current
     lda #CLOCK_STATUS_ERROR
-    sta status,x
+    sta clock_status
     rts
 
-:   ldx clocks_current
-    lda ds3231_data + DS3231_SECOND
-    sta second,x
+:   lda ds3231_data + DS3231_SECOND
+    sta clock_second
     lda ds3231_data + DS3231_MINUTE
-    sta minute,x
+    sta clock_minute
     lda ds3231_data + DS3231_HOUR
     and #DS3231_HOURS_12
     beq hours_24
     lda ds3231_data + DS3231_HOUR
     and #$1f
-    sta hour,x
+    sta clock_hour
     lda ds3231_data + DS3231_HOUR
     and #DS3231_PM
-    sta am_pm,x
+    sta clock_am_pm
     jmp hour_done
 hours_24:
     lda ds3231_data + DS3231_HOUR
     and #$3f
-    sta hour,x
+    sta clock_hour
     lda #0
-    sta am_pm,x
+    sta clock_am_pm
 hour_done:
     lda ds3231_data + DS3231_WEEKDAY
     sec
     sbc #1
-    sta weekday,x
+    sta clock_weekday
     lda ds3231_data + DS3231_DAY
-    sta day,x
+    sta clock_day
     lda ds3231_data + DS3231_MONTH
     and #$7f
-    sta month,x
+    sta clock_month
     lda ds3231_data + DS3231_YEAR
-    sta year,x
+    sta clock_year
     lda #0
-    sta status,x
+    sta clock_status
     rts
 }
 
@@ -145,6 +143,9 @@ read_ds3231 {
 }
 
 detect_ds3231 {
+    sta clock_ds3231_info
+    load_word clock_ds3231_name
+    jsr display_scanning
     sta clock_ds3231_info
     jsr set_ds3231_pins
     jsr i2c_init

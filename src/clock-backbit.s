@@ -36,10 +36,12 @@
 ; Arguments: -
 ; Returns: -
 .public clock_backbit_detect {
+    lda #CLOCK_PARAMETER_NONE
+    load_word clock_backbit_name
+    jsr display_scanning
     jsr backbit_detect
     bne :+
-    ldx #<clock_backbit_info
-    ldy #>clock_backbit_info
+    load_word clock_backbit_info
     jsr clock_register
 :   rts
 }
@@ -61,28 +63,28 @@ clock_backbit_read {
     bne :-
 
     jsr read_ascii
-    sta century,x
+    sta clock_century
     jsr read_ascii
-    sta year,x
+    sta clock_year
     jsr read_ascii
-    sta month,x
+    sta clock_month
     jsr read_ascii
-    sta day,x
+    sta clock_day
     lda BACKBIT_RTC_HOUR
     and #$1f
-    sta hour,x
+    sta clock_hour
     lda BACKBIT_RTC_HOUR
     and #$80
-    sta am_pm,x
+    sta clock_am_pm
     lda BACKBIT_RTC_MINUTE
-    sta minute,x
+    sta clock_minute
     lda BACKBIT_RTC_SECOND
-    sta second,x
+    sta clock_second
     lda BACKBIT_RTC_SUB_SECOND
-    sta sub_second,x
+    sta clock_sub_second
     cli
     lda #0
-    sta status,x
+    sta clock_status
     rts
 }
 

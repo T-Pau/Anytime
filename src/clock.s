@@ -26,6 +26,20 @@
 ; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 ; IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+CLOCK_WEEKDAY = 0
+CLOCK_CENTURY = 1
+CLOCK_YEAR = 2
+CLOCK_MONTH = 3
+CLOCK_DAY = 4
+CLOCK_HOUR = 5
+CLOCK_MINUTE = 6
+CLOCK_SECOND = 7
+CLOCK_SUB_SECOND = 8
+CLOCK_AM_PM = 9
+CLOCK_STATUS = 10
+CLOCK_SIZE = 11
+
 MAX_CLOCK_DISPLAYS = 6
 MAX_CLOCKS = 16
 
@@ -35,6 +49,8 @@ CLOCK_FLAG_24_HOURS = $20
 CLOCK_FLAG_SUB_SECOND = $1
 
 CLOCK_STATUS_ERROR = $80
+
+CLOCK_PARAMETER_NONE = $ff
 
 .section code
 
@@ -101,7 +117,6 @@ read:
     bne loop
 }
 
-
 ; Register clock
 ; Arguments:
 ;   X/Y: pointer to clock info
@@ -145,35 +160,37 @@ clock_register {
     rts
 }
 
-; X: clock index
-; preserves X
+; Normalize clock based on flags
+; Arguments:
+;   X: clock index
+; Preserves: X
 clock_normalize {
-    lda status,x
+    lda clock_status
     bne end
     lda clocks_flags,x
     and #CLOCK_FLAG_CENTURY
     bne century_ok
     ldy #$20
-    lda year,x
+    lda clock_year
     cmp #$70
     bcc :+
     ldy #$19
 :   tya
-    sta century,x
+    sta clock_century
 century_ok:
     lda clocks_flags,x
     and #CLOCK_FLAG_24_HOURS
     bne end
-    lda am_pm,x
+    lda clock_am_pm
     beq end
-    lda hour,x
+    lda clock_hour
     sei
     sed
     clc
     adc #$12
     cld
     cli
-    sta hour,x
+    sta clock_hour
 end:
     rts
 }
@@ -214,16 +231,15 @@ clocks_name_high .reserve MAX_CLOCKS
 clocks_parameter .reserve MAX_CLOCKS
 clocks_flags .reserve MAX_CLOCKS
 
-
-
-weekday .reserve MAX_CLOCK_DISPLAYS
-century .reserve MAX_CLOCK_DISPLAYS
-year .reserve MAX_CLOCK_DISPLAYS
-month .reserve MAX_CLOCK_DISPLAYS
-day .reserve MAX_CLOCK_DISPLAYS
-hour .reserve MAX_CLOCK_DISPLAYS
-minute .reserve MAX_CLOCK_DISPLAYS
-second .reserve MAX_CLOCK_DISPLAYS
-sub_second .reserve MAX_CLOCK_DISPLAYS
-am_pm .reserve MAX_CLOCK_DISPLAYS
-status .reserve MAX_CLOCK_DISPLAYS
+clock .reserve CLOCK_SIZE
+clock_weekday = clock + CLOCK_WEEKDAY
+clock_century = clock + CLOCK_CENTURY
+clock_year = clock + CLOCK_YEAR
+clock_month = clock + CLOCK_MONTH
+clock_day = clock + CLOCK_DAY
+clock_hour = clock + CLOCK_HOUR
+clock_minute = clock + CLOCK_MINUTE
+clock_second = clock + CLOCK_SECOND
+clock_sub_second = clock + CLOCK_SUB_SECOND
+clock_am_pm = clock + CLOCK_AM_PM
+clock_status = clock + CLOCK_STATUS

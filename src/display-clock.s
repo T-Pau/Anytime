@@ -33,6 +33,8 @@ BACKGROUND_COLOR = COLOR_GREY_3
 NAME_COLOR = COLOR_BLACK
 CLOCK_COLOR = COLOR_GREY_1
 
+SCANNING_OFFSET = 13 * 40
+
 .section code
 
 ; Set up clock display based on flags.
@@ -181,13 +183,13 @@ no_number:
 ; Preserves: -
 .public display_clock {
     setup_clock_display_position
-    lda status,x
+    lda clock_status
     beq :+
     jmp display_clock_invalid
 :   lda clocks_flags,x
     bpl no_weekday
     ldy #0
-    lda weekday,x
+    lda clock_weekday
     asl
     asl
     tax
@@ -206,15 +208,15 @@ no_number:
 no_weekday:
     ldy #2
 date:
-    lda day,x
+    lda clock_day
     jsr display_bcd
     iny
-    lda month,x
+    lda clock_month
     jsr display_bcd
     iny
-    lda century,x
+    lda clock_century
     jsr display_bcd
-    lda year,x
+    lda clock_year
     jsr display_bcd
 
     ldy #43
@@ -222,19 +224,19 @@ date:
     and #1
     beq time
     ldy #51
-    lda sub_second,x
+    lda clock_sub_second
     and #$0f
     ora #$30
     sta (screen_ptr),y
     ldy #42
 time:
-    lda hour,x
+    lda clock_hour
     jsr display_bcd
     iny
-    lda minute,x
+    lda clock_minute
     jsr display_bcd
     iny
-    lda second,x
+    lda clock_second
     jmp display_bcd
 }
 
@@ -321,6 +323,170 @@ time:
     rts
 }
 
+
+; Display scanning message for clock
+; Arguments:
+;   X/Y: pointer to name
+;   A: parameter
+display_scanning {
+    ; save parameters
+    stx ptr
+    sty ptr + 1
+    sta display_parameter
+
+    store_word screen_ptr, display_line
+    lda #$0
+    jsr display_string
+    lda display_parameter
+    cmp #CLOCK_PARAMETER_NONE
+    beq line_done
+    lda #$20 ; ' ':screen
+    sta (screen_ptr),y
+    iny
+    lda #$23 ; '#':screen
+    sta (screen_ptr),y
+    iny
+    ldx #0
+    lda display_parameter
+    jsr display_number
+line_done:
+    lda #0
+    sta (screen_ptr),y
+
+    store_word ptr, display_line
+    store_word screen_ptr, screen + SCANNING_OFFSET
+
+    lda #$80
+    jmp display_line_centered
+}
+
+; Display line at ptr centered.
+; Parameters:
+;   A: color
+display_line_centered {
+    sta display_color
+
+    ; clear line
+    ; TODO: only clear parts not used by string
+    ldy #39
+    ora #$20 ; ' ':screen
+:   sta (screen_ptr),y
+    dey
+    bpl :-
+
+    ; calculate length
+    ldy #0
+:   lda (ptr),y
+    beq length_done
+    iny
+    bne :-
+length_done:
+    tya
+    lsr
+    sta display_tmp
+    lda #20
+    sec
+    sbc display_tmp
+    clc
+    adc screen_ptr
+    sta screen_ptr
+    lda #0
+    adc screen_ptr + 1
+    sta screen_ptr + 1
+
+    ; display name
+    lda #$80
+    jmp display_string
+}
+
+; Increase screen pointer by Y.
+; Arguments:
+;   Y: amount to increase
+; Preserves: X
+update_screen_ptr {
+    tya
+    clc
+    adc screen_ptr
+    sta screen_ptr
+    bcc :+
+    inc screen_ptr + 1
+:   rts
+}
+
+
+; Display A as decimal number.
+; Arguments:
+;   A: number
+;   X: color
+; Returns:
+;   Y: increased by length of number
+display_number {
+    stx display_color
+    ldx #0
+:   cmp #100
+    bcc hundreds_done
+    sec
+    sbc #100
+    inx
+    bne :-
+hundreds_done:
+    stx display_zeroes
+    cpx #0
+    beq tens
+    sta display_tmp
+    txa
+    ora #$30 ; '0':screen
+    ora display_color
+    sta (screen_ptr),y
+    iny
+    lda display_tmp
+tens:
+    ldx #0
+:   cmp #10
+    bcc tens_done
+    sec
+    sbc #10
+    inx
+    bne :-
+tens_done:
+    sta display_tmp
+    cpx #0
+    bne display_tens
+    lda display_zeroes
+    beq ones
+display_tens:
+    txa
+    ora #$30 ; '0':screen
+    ora display_color
+    sta (screen_ptr),y
+    iny
+ones:
+    lda display_tmp
+    ora #$30 ; '0':screen
+    ora display_color
+    sta (screen_ptr),y
+    iny
+    rts
+}
+
+; Display string at ptr.
+; Arguments:
+;   A: color
+; Returns: -
+; Preserves: X
+display_string {
+    sta display_color
+    ldy #0
+:   lda (ptr),y
+    beq done
+    ora display_color
+    sta (screen_ptr),y
+    iny
+    bne :-
+done:
+    rts
+}
+
 ; X: clock index
 ; preserves X
 .macro setup_clock_display_position {
@@ -343,7 +509,11 @@ weekdays {
     .data "sun":screen, 0
 }
 
-.section zero_page
+.section reserved
 
 display_tmp .reserve 1
 display_zeroes .reserve 1
+display_color .reserve 1
+display_parameter .reserve 1
+
+display_line .reserve 41
