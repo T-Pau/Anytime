@@ -44,23 +44,21 @@ help {
     jsr display_help
     ldx #0
     jsr help_display_page
+    load_word help_commands
+    lda #.sizeof(help_commands)
+    jsr command_set_table
 loop:
-    jsr GETIN
-    beq loop
-    cmp #HELP_KEY_RETURN
-    bne :+
+    jsr command_handle
+    jmp loop
+}
+
+
+; Return to program.
+help_return {
+    ; We won't return.
+    pla
+    pla
     jmp main
-:   cmp #HELP_KEY_NEXT_1
-    bne :+
-next_page:
-    jsr help_next_page
-    jmp loop
-:   cmp #HELP_KEY_NEXT_2
-    beq next_page
-    cmp #HELP_KEY_PREVIOUS
-    bne loop
-    jsr help_previous_page
-    jmp loop
 }
 
 ; Display help page.
@@ -100,4 +98,13 @@ help_previous_page {
     ldx help_screens_count
     dex
 :   jmp help_display_page
+}
+
+.section data
+
+help_commands {
+    .data $5f, help_return
+    .data $20, help_next_page
+    .data $2b, help_next_page
+    .data $2d, help_previous_page
 }

@@ -15,6 +15,7 @@ sources :=
     clock-mega65.s
     clock-smartmouse.s
     clock-ultimate.s
+    command.s
     detect-screen.s
     display-clock.s
     help.s

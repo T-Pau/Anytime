@@ -1,4 +1,4 @@
-; start.s -- main routine
+; command.s -- handle keyboard commands
 ;
 ; Copyright (C) Dieter Baron
 ;
@@ -28,36 +28,50 @@
 
 .section code
 
-KEY_HELP = $88 ; F7
-
-.public start {
-    jsr setup_display
-    jsr display_detect
-    jsr clocks_init
-    jmp main
+; Set command table.
+; Arguments:
+;   X/Y: table
+;   A: size
+command_set_table {
+    stx command_ptr
+    sty command_ptr + 1
+    sta command_size
 }
 
-main {
-    jsr display_main
-    jsr clocks_init_display
-    load_word main_commands
-    lda #.sizeof(main_commands)
-    jsr command_set_table
+; Check keyboard and handle command
+command_handle {
+    jsr GETIN
+    beq end
+    sta command_key
+    ldy #0
 loop:
-    jsr clocks_update
-    jsr command_handle
-    jmp loop
+    cmp (command_ptr),y
+    bne not
+    iny
+    lda (command_ptr),y
+    iny
+    sta command_call
+    lda (command_ptr),y
+    sta command_call + 1
+    lda command_key
+    jmp (command_call)
+not:
+    iny
+    iny
+    iny
+    cpy command_size
+    bcc loop
+end:
+    rts
 }
 
-enter_help {
-    ; We won't return
-    pla
-    pla
-    jmp help
-}
+.section zero_page
 
-.section data
+command_ptr .reserve 2
 
-main_commands {
-    .data $88, enter_help
-}
+.section reserved
+
+command_size .reserve 1
+
+command_call .reserve 2
+command_key .reserve 1

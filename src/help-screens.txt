@@ -51,7 +51,7 @@ This is Anytime ${VERSION}. The newest version and further information can be fo
 Supported Devices
 
 - BackBit Cartridge
-- CMD FD-2000 with Real Time Clock module
+- CMD FD-2000 with RTC module
 - CMD FD-4000
 - CMD HD
 - CMD RAMLink
@@ -59,7 +59,7 @@ Supported Devices
 - IDE64
 - MEGA65
 - SD2IEC with Real Time Clock
-- User Port DS3231 Real Time Clock Module
+- User Port DS3231 Module
 ---
 BackBit Cartridge
 
