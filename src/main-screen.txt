@@ -50,7 +50,7 @@ name main_screen
 
 
 
-                f7: help
+     f7: help    f8: rescan clocks
 
 
                                    t'pau

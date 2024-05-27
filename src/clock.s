@@ -55,6 +55,7 @@ CLOCK_PARAMETER_NONE = $ff
 clocks_init {
     lda #0
     sta clocks_count
+    sta clocks_active_start
     jsr clock_ultimate_detect
     jsr clock_mega65_detect
     jsr clock_backbit_detect
@@ -76,7 +77,7 @@ clocks_init_display {
     store_word source_ptr, no_clocks
     store_word destination_ptr, screen
     jmp rl_expand
-:   ldx #0
+:   ldx clocks_active_start
 loop:
     cpx clocks_active_count
     bne :+
@@ -96,10 +97,36 @@ no_open:
     ldx clocks_current
     inx
     bne loop
+    rts
+}
+
+; Close clocks on current page.
+; Arguments: -
+; Returns: -
+clocks_close {
+    ldx clocks_active_start
+loop:
+    cpx clocks_active_count
+    bne :+
+    rts
+:   stx clocks_current
+    lda clocks_close_high,x
+    beq no_close
+    sta close + 2
+    lda clocks_close_low,x
+    sta close + 1
+    lda clocks_parameter,x
+close:
+    jsr $1000
+no_close:
+    ldx clocks_current
+    inx
+    bne loop
+    rts
 }
 
 clocks_update {
-    ldx #0
+    ldx clocks_active_start
 loop:
     cpx clocks_active_count
     bne :+
@@ -232,6 +259,7 @@ clocks_screen_position_high {
 .section reserved
 
 clocks_count .reserve 1
+clocks_active_start .reserve 1
 clocks_active_count .reserve 1
 clocks_current .reserve 1
 clocks_read_low .reserve MAX_CLOCKS

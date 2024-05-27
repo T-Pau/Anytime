@@ -103,8 +103,8 @@ help_previous_page {
 .section data
 
 help_commands {
-    .data $5f, help_return
-    .data $20, help_next_page
-    .data $2b, help_next_page
-    .data $2d, help_previous_page
+    .data $5f, help_return ; '←'
+    .data $20, help_next_page ; ' '
+    .data $2b, help_next_page ; '+'
+    .data $2d, help_previous_page ; '-'
 }

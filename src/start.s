@@ -56,8 +56,17 @@ enter_help {
     jmp help
 }
 
+rescan {
+    ; We won't return
+    pla
+    pla
+    jsr clocks_close
+    jmp start
+}
+
 .section data
 
 main_commands {
-    .data $88, enter_help
+    .data $88, enter_help ; '{f7}'
+    .data $8c, rescan ; '{f8}'
 }
