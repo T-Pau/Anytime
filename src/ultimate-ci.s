@@ -166,13 +166,13 @@ done:
     lda ultimate_ci_status_length
     beq end
     lda ultimate_ci_status
-    cmp #$30 ; '0'
+    cmp #'0'
     bne end
     ldx #1
 :   lda ultimate_ci_status,x
-    cmp #$2c ; ','
+    cmp #','
     beq end
-    cmp #$30
+    cmp #'0'
     bne end
     inx
     cpx ultimate_ci_status_length

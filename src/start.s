@@ -67,6 +67,6 @@ rescan {
 .section data
 
 main_commands {
-    .data $88, enter_help ; '{f7}'
-    .data $8c, rescan ; '{f8}'
+    .data '{f7}', enter_help
+    .data '{f8}', rescan
 }

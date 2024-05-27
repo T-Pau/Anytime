@@ -36,6 +36,8 @@ CLOCK_COLOR_SYNTHETIC = COLOR_GREY_2
 
 SCANNING_OFFSET = 13 * 40
 
+CHAR_INVALID = '-':screen
+
 .section code
 
 ; Set up clock display based on flags.
@@ -92,13 +94,13 @@ SCANNING_OFFSET = 13 * 40
     sta (ptr),y
     iny
     bne :-
-:   lda #$a0 ; ' ':screen_inverted
+:   lda #' ':screen_inverted
     sta (screen_ptr),y
     iny
     lda clocks_parameter,x
     cmp #$ff
     beq no_number
-    lda #$a3 ; '#':screen_inverted
+    lda #'#':screen_inverted
     sta (screen_ptr),y
     lda #PARAMETER_COLOR
     sta (ptr),y
@@ -117,7 +119,7 @@ hundreds_done:
     beq tens
     sta display_tmp
     txa
-    ora #$b0 ; '0':screen_inverted
+    ora #'0':screen_inverted
     sta (screen_ptr),y
     lda #PARAMETER_COLOR
     sta (ptr),y
@@ -139,20 +141,20 @@ tens_done:
     beq ones
 display_tens:
     txa
-    ora #$b0 ; '0':screen_inverted
+    ora #'0':screen_inverted
     sta (screen_ptr),y
     lda #PARAMETER_COLOR
     sta (ptr),y
     iny
 ones:
     lda display_tmp
-    ora #$b0 ; '0':screen_inverted
+    ora #'0':screen_inverted
     sta (screen_ptr),y
     lda #PARAMETER_COLOR
     sta (ptr),y
     iny
 no_number:
-    lda #$a0 ; ' ':screen
+    lda #' ':screen_inverted
 :   sta (screen_ptr),y
     iny
     cpy #14
@@ -216,7 +218,7 @@ no_number:
 ; Returns: -
 ; Preserves: -
 display_clock_invalid {
-    lda #$2d ; '-':screen
+    lda #CHAR_INVALID
     ldy clocks_flags,x
     ldy #0
     sta (screen_ptr),y
@@ -262,19 +264,36 @@ display_clock_invalid {
     rts
 }
 
-
+; Display BCD number in A at (screen_ptr),Y.
+; Arguments:
+;   A: BCD number
+;   Y: offset
+; Returns:
+;   Y: offset after number
+; Preserves: X
 .public display_bcd {
+    cmp #$a0
+    bcc valid
+invalid:
+    lda #CHAR_INVALID
+    sta (screen_ptr),y
+    iny
+    jmp ones
+valid:
     sta display_tmp
     lsr
     lsr
     lsr
     lsr
+    cmp #$0a
+    bcs invalid
     ora #$30
     sta (screen_ptr),y
     iny
     lda display_tmp
     and #$0f
     ora #$30
+ones:
     sta (screen_ptr),y
     iny
     rts
@@ -297,10 +316,10 @@ display_scanning {
     lda display_parameter
     cmp #CLOCK_PARAMETER_NONE
     beq line_done
-    lda #$20 ; ' ':screen
+    lda #' ':screen
     sta (screen_ptr),y
     iny
-    lda #$23 ; '#':screen
+    lda #'#':screen
     sta (screen_ptr),y
     iny
     ldx #0
@@ -326,7 +345,7 @@ display_line_centered {
     ; clear line
     ; TODO: only clear parts not used by string
     ldy #39
-    ora #$20 ; ' ':screen
+    ora #' ':screen
 :   sta (screen_ptr),y
     dey
     bpl :-
@@ -392,7 +411,7 @@ hundreds_done:
     beq tens
     sta display_tmp
     txa
-    ora #$30 ; '0':screen
+    ora #'0':screen
     ora display_color
     sta (screen_ptr),y
     iny
@@ -413,13 +432,13 @@ tens_done:
     beq ones
 display_tens:
     txa
-    ora #$30 ; '0':screen
+    ora #'0':screen
     ora display_color
     sta (screen_ptr),y
     iny
 ones:
     lda display_tmp
-    ora #$30 ; '0':screen
+    ora #'0':screen
     ora display_color
     sta (screen_ptr),y
     iny
@@ -477,27 +496,27 @@ CLOCK_FRAME_HEIGHT = 4
 
 clock_frame {
     .data "[":screen
-    rl_encode CLOCK_FRAME_WIDTH - 2, $20 ; ' ':screen
+    rl_encode CLOCK_FRAME_WIDTH - 2, ' ':screen
     .data "]":screen
     rl_skip 40 - CLOCK_FRAME_WIDTH
-    rl_encode 7, $20 ; ' ':screen
+    rl_encode 7, ' ':screen
     .data "/  /":screen
-    rl_encode 5, $20 ; ' ':screen
+    rl_encode 5, ' ':screen
     rl_skip 40 - CLOCK_FRAME_WIDTH
-    rl_encode 6, $20 ; ' ':screen
+    rl_encode 6, ' ':screen
     .data ":  :":screen
-    rl_encode 6, $20 ; ' ':screen
+    rl_encode 6, ' ':screen
     rl_skip 40 - CLOCK_FRAME_WIDTH
     .data "<":screen
-    rl_encode CLOCK_FRAME_WIDTH - 2, $1c ; '£':screen
+    rl_encode CLOCK_FRAME_WIDTH - 2, '£':screen
     .data ">":screen
     rl_end
 }
 
 no_clocks {
-    rl_encode 40 * 8 + 12, $a0 ; ' ':screen_inverted
+    rl_encode 40 * 8 + 12, ' ':screen_inverted
     .data "no clocks found.":screen_inverted
-    rl_encode 40 * 9, $a0 ; ' ':screen_inverted
+    rl_encode 40 * 9, ' ':screen_inverted
     rl_end
 }
 
