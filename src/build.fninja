@@ -28,6 +28,7 @@ sources :=
     smartmouse.s
     start.s
     ultimate-ci.s
+    weekday.s
 
 build anytime.prg | anytime.prg.sym: link $sources
     target = c64-basic

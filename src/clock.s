@@ -141,6 +141,7 @@ read:
     jsr $1000
     ldx clocks_current
     jsr clock_normalize
+    ldx clocks_current
     jsr display_clock
     ldx clocks_current
     inx
@@ -193,22 +194,10 @@ clock_register {
 ; Normalize clock based on flags
 ; Arguments:
 ;   X: clock index
-; Preserves: X
 clock_normalize {
     lda clock_status
     bne end
     lda clocks_flags,x
-    and #CLOCK_FLAG_WEEKDAY
-    bne :+
-    lda #8
-    bne weekday
-:   lda clock_weekday
-weekday:
-    cmp #7
-    bcc :+
-    lda #8
-    sta clock_weekday
-:   lda clocks_flags,x
     and #CLOCK_FLAG_CENTURY
     bne century_ok
     ldy #$20
@@ -220,6 +209,17 @@ weekday:
     sta clock_century
 century_ok:
     lda clocks_flags,x
+    and #CLOCK_FLAG_WEEKDAY
+    bne :+
+    jsr weekday_calculate
+    bne store_weekday
+:   lda clock_weekday
+    cmp #7
+    bcc :+
+    lda #8
+store_weekday:
+    sta clock_weekday
+:   lda clocks_flags,x
     and #CLOCK_FLAG_24_HOURS
     bne end
     lda clock_am_pm
