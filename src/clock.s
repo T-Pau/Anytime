@@ -56,6 +56,7 @@ clocks_init {
     lda #0
     sta clocks_count
     sta clocks_active_start
+;    jsr clock_wic64_detect
     jsr clock_ultimate_detect
     jsr clock_mega65_detect
     jsr clock_backbit_detect
