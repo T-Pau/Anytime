@@ -8,14 +8,17 @@ built_dist_files :=
 dist_files :=
   README.md
   NEWS.md
+  Documentation
   $built_dist_files
 #  screenshot.png
 
+rule create-zip
+    command = {{$top_source_directory/Toolkit/bin/create-zip}} -M $depfile $flags $out $in
+    depfile = .dep.$out
 
-rule zip
-  command = zip -9jq $out $in
 
-build $distfile: zip $dist_files
+build $distfile: create-zip $dist_files
+    flags = --strip $top_source_directory --strip src
 
 build dist: phony $distfile
 
