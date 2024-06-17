@@ -1,5 +1,6 @@
 # Bugs
 
+- Fix reading keyboard on C128.
 - Fix AM/PM conversion for 12:xx.
     ; 12:58 in 12h clock (IEC)
    ; 00 20 24 05  26 12 57 10  20 00
@@ -7,10 +8,9 @@
 
 # Features
 
-- help pages
-- rescan clocks
-- select active clocks (if more than six are found)
-- edit and copy clocks
+- Make key bindings consistent with Joyride.
+- Switch clock pages, display dots.
+- Edit and copy clocks.
 
 # Hardware Support 
 

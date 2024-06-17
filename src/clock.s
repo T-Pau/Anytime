@@ -58,7 +58,9 @@ clocks_init {
     sta clocks_active_start
 ;    jsr clock_wic64_detect
     jsr clock_ultimate_detect
-    jsr clock_mega65_detect
+    .if !.defined(C128) {
+        jsr clock_mega65_detect
+    }
     jsr clock_backbit_detect
     jsr clock_iec_detect
     jsr clock_smartmouse_detect

@@ -3,7 +3,7 @@ petcat = petcat
 include ../Toolkit/fast-ninja/xlr8.fninja
 include ../Toolkit/fast-ninja/scripts.fninja
 
-sources :=
+sources_common :=
     ../Toolkit/xlr8/6502/rl-expand.s
     ../Toolkit/xlr8/6502/utility.s
     backbit.s
@@ -12,7 +12,6 @@ sources :=
     clock-backbit.s
     clock-ds3231.s
     clock-iec.s
-    clock-mega65.s
     clock-smartmouse.s
     clock-ultimate.s
     clock-wic64.s
@@ -33,11 +32,24 @@ sources :=
     wic64.s
     wic64-interface.s
 
-build anytime.prg | anytime.prg.sym: link $sources
+sources_c64 :=
+    $sources_common
+    clock-mega65.s
+
+sources_c128 :=
+    $sources_common
+
+build anytime-c64.prg | anytime-c64.prg.sym: link $sources_c64
     target = c64-basic
     libs = cbm.lib mega65.lib
 
-build anytime.prg.ll: vice-ll anytime.prg.sym
+build anytime-c64.prg.ll: vice-ll anytime-c64.prg.sym
+
+build anytime-c128.prg | anytime-c128.prg.sym: link $sources_c128
+    target = c128-basic
+    libs = cbm.lib c128.lib
+
+build anytime-c128.prg.ll: vice-ll anytime-c128.prg.sym
 
 build charset.s: convert-charset charset.png
     flags = -i

@@ -3,7 +3,8 @@ VERSION = 0.1
 distfile := Anytime-$VERSION.zip
 
 built_dist_files :=
-  src/anytime.prg
+  src/anytime-c64.prg
+  src/anytime-c128.prg
 
 dist_files :=
   README.md

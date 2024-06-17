@@ -39,6 +39,9 @@ destination_ptr = screen_ptr
 setup_display {
     lda #VIC_VIDEO_ADDRESS(screen, charset)
     sta VIC_VIDEO_ADDRESS
+    .if .defined(C128) {
+        sta $0A2C
+    }
 
     lda #FRAME_COLOR
     sta VIC_BORDER_COLOR
