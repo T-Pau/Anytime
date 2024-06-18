@@ -28,9 +28,16 @@
 
 .section code
 
-KEY_HELP = $88 ; F7
+.pre_if .defined(C128)
+KERNAL_STORE_KEY = $C6AD
+KERNAL_STORE_KEY_RAW = $C6B7
+KERNAL_STORE_KEY_VECTOR = $033c
+.pre_end
 
 .public start {
+    .if .defined(C128) {
+        store_word KERNAL_STORE_KEY_VECTOR, KERNAL_STORE_KEY_RAW
+    }
     jsr setup_display
     jsr display_detect
     jsr clocks_init
@@ -68,5 +75,6 @@ rescan {
 
 main_commands {
     .data '{f7}', enter_help
+    .data '{help}', enter_help
     .data '{f8}', rescan
 }

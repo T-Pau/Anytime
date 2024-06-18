@@ -1,6 +1,5 @@
 # Bugs
 
-- Fix reading keyboard on C128.
 - Fix AM/PM conversion for 12:xx.
     ; 12:58 in 12h clock (IEC)
    ; 00 20 24 05  26 12 57 10  20 00
