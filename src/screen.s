@@ -40,7 +40,7 @@ setup_display {
     lda #VIC_VIDEO_ADDRESS(screen, charset)
     sta VIC_VIDEO_ADDRESS
     .if .defined(C128) {
-        sta $0A2C
+        sta $0a2c
     }
 
     lda #FRAME_COLOR
