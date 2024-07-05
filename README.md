@@ -2,7 +2,7 @@
 
 ![Screenshot](screenshot.png)
 
-This program automatically detects supported real time clocks connected to your Commodore 64 and continuously displays them.
+This program automatically detects supported real time clocks connected to your Commodore 64 / 128 and continuously displays them.
 
 It is currently in the early stages of development. Setting clocks is not yet supported.
 
