@@ -491,35 +491,6 @@ done:
 
 .section data
 
-CLOCK_FRAME_WIDTH = 16
-CLOCK_FRAME_HEIGHT = 4
-
-clock_frame {
-    .data "[":screen
-    rl_encode CLOCK_FRAME_WIDTH - 2, ' ':screen
-    .data "]":screen
-    rl_skip 40 - CLOCK_FRAME_WIDTH
-    rl_encode 7, ' ':screen
-    .data "/  /":screen
-    rl_encode 5, ' ':screen
-    rl_skip 40 - CLOCK_FRAME_WIDTH
-    rl_encode 6, ' ':screen
-    .data ":  :":screen
-    rl_encode 6, ' ':screen
-    rl_skip 40 - CLOCK_FRAME_WIDTH
-    .data "<":screen
-    rl_encode CLOCK_FRAME_WIDTH - 2, '£':screen
-    .data ">":screen
-    rl_end
-}
-
-no_clocks {
-    rl_encode 40 * 8 + 12, ' ':screen_inverted
-    .data "no clocks found.":screen_inverted
-    rl_encode 40 * 9, ' ':screen_inverted
-    rl_end
-}
-
 weekdays {
     .data "sun":screen, 0
     .data "mon":screen, 0

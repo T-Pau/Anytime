@@ -86,33 +86,3 @@ display_help {
 .section zero_page
 
 screen_ptr .reserve 2
-
-.section data
-
-.public main_color {
-    .repeat 3 {
-        rl_encode 40, NAME_COLOR
-        rl_encode 40, FRAME_COLOR
-        rl_encode 80, CLOCK_COLOR
-        rl_encode 80, FRAME_COLOR
-    }
-    rl_encode 7*40 - 5, NAME_COLOR
-    rl_encode 5, TPAU_COLOR
-    rl_end
-}
-
-.public help_color {
-    rl_encode 40, NAME_COLOR
-    rl_encode 40, FRAME_COLOR
-    rl_encode 18 * 40, CLOCK_COLOR
-    rl_encode 40, FRAME_COLOR
-    rl_encode 4 * 40 - 5, NAME_COLOR
-    rl_encode 5, TPAU_COLOR
-    rl_end
-}
-
-.public detect_color {
-    rl_encode 25 * 40 - 5, PARAMETER_COLOR
-    rl_encode 5, TPAU_COLOR
-    rl_end
-}

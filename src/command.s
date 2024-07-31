@@ -36,6 +36,7 @@ command_set_table {
     stx command_ptr
     sty command_ptr + 1
     sta command_size
+    rts
 }
 
 ; Check keyboard and handle command

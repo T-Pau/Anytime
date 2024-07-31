@@ -1,0 +1,21 @@
+name clock_frame
+single_screen 1
+lines 4
+line_length 16
+line_skip 24
+
+map $40-$5a $00
+map $61-$7a $01
+map $2190 $1f
+map $20-$3f $20
+
+map '◤' $1b
+map '◥' $1d
+map '◣' $3c
+map '◢' $3e
+map '▁' $1c
+---
+◤              ◥
+       /  /
+      :  :
+◣▁▁▁▁▁▁▁▁▁▁▁▁▁▁◢      

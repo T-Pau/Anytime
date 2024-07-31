@@ -6,24 +6,28 @@ include ../Toolkit/fast-ninja/scripts.fninja
 sources_common :=
     ../Toolkit/xlr8/6502/rl-expand.s
     ../Toolkit/xlr8/6502/utility.s
+    ../Toolkit/xlr8/generic/rl-encode.s
     backbit.s
     charset.s
     clock.s
     clock-backbit.s
     clock-ds3231.s
+    clock-frame.s
     clock-iec.s
     clock-smartmouse.s
     clock-ultimate.s
     clock-wic64.s
+    colors.s
     command.s
     detect-screen.s
     display-clock.s
     help.s
     help-screen.s
     help-screens.s
-    main-screen.s
     i2c.s
     iec.s
+    main-screen.s
+    no-clocks.s    
     screen.s
     smartmouse.s
     start.s
@@ -58,6 +62,11 @@ build charset.s: convert-charset charset.png
 build detect-screen.s: convert-screens detect-screen.txt
 build help-screen.s: convert-screens help-screen.txt
 build main-screen.s: convert-screens main-screen.txt
+build clock-frame.s: convert-screens clock-frame.txt
+build no-clocks.s: convert-screens no-clocks.txt
+
+build colors.s: encode-colors colors.col
+    flags = -r
 
 build help-screens.s: convert-screens help-screens.txt
     flags = -DVERSION=$VERSION

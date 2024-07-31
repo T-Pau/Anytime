@@ -23,7 +23,9 @@
 ; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ; SOFTWARE.
 
-bufptr = $fb
+.section zero_page
+
+bufptr .reserve 1
 
 client_timeout  = 50 ;wait time for client to ack the address
 
@@ -94,6 +96,8 @@ delay {
 
 ;read/write size and buffer pointer
 
+.section reserved 
+
 regsz .reserve 1
 regbuf .reserve 2
 
@@ -105,6 +109,8 @@ reg .reserve 1
 ;-----------------------
 ;--[ set data direct ]--
 ;-----------------------
+
+.section code 
 
 sda_out {
     lda datadir
